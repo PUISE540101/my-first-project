@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>月歷排班表</title>
+    <style>
+        :root {
+            --primary-color: #3b82f6;
+            --bg-color: #f8fafc;
+            --card-bg: #ffffff;
+            --text-color: #1e293b;
+            --border-color: #e2e8f0;
+            
+            /* 班別顏色 */
+            --shift-early: #dbeafe;   /* 早班 - 藍 */
+            --shift-mid: #fef08a;     /* 中班 - 黃 */
+            --shift-night: #fed7aa;   /* 晚班 - 橘 */
+            --shift-off: #f1f5f9;     /* 休假 - 灰 */
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 900px;
+            background: var(--card-bg);
+            padding: 24px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            margin: 0;
+            font-size: 1.5rem;
+        }
+
+        .btn-group button {
+            background-color: #fff;
+            border: 1px solid var(--border-color);
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.95rem;
+            transition: background 0.2s;
+        }
+
+        .btn-group button:hover {
+            background-color: #f1f5f9;
+        }
+
+        .legend {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            font-size: 0.9rem;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .legend-color {
+            width: 16px;
+            height: 16px;
+            border-radius: 4px;
+        }
+
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 8px;
+        }
+
+        .weekday-header {
+            text-align: center;
+            font-weight: 600;
+            color: #64748b;
+            padding: 8px 0;
+            font-size: 0.9rem;
+        }
+
+        .day-cell {
+            aspect-ratio: 1;
+            background-color: #fff;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 8px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+        }
+
+        .day-cell:hover {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
+        }
+
+        .day-cell.empty {
+            background-color: transparent;
+            border: none;
+            cursor: default;
+            box-shadow: none;
+        }
+
+        .day-number {
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .shift-tag {
+            font-size: 0.8rem;
+            text-align: center;
+            padding: 4px;
+            border-radius: 4px;
+            font-weight: 500;
+        }
+
+        /* 班別狀態顏色 */
+        .day-cell[data-shift="early"] { background-color: var(--shift-early); border-color: #93c5fd; }
+        .day-cell[data-shift="mid"] { background-color: var(--shift-mid); border-color: #fde047; }
+        .day-cell[data-shift="night"] { background-color: var(--shift-night); border-color: #fdba74; }
+        .day-cell[data-shift="off"] { background-color: var(--shift-off); border-color: #cbd5e1; color: #94a3b8; }
+
+        .stats {
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            gap: 20px;
+            font-size: 0.9rem;
+            color: #475569;
+        }
+
+        .hint {
+            margin-top: 10px;
+            font-size: 0.85rem;
+            color: #64748b;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <div class="btn-group">
+            <button onclick="changeMonth(-1)">◀ 上個月</button>
+        </div>
+        <h1 id="month-year-display"></h1>
+        <div class="btn-group">
+            <button onclick="changeMonth(1)">下個月 ▶</button>
+        </div>
+    </header>
+
+    <div class="legend">
+        <span>點擊日期切換班別：</span>
+        <div class="legend-item"><div class="legend-color" style="background: var(--shift-early);"></div>早班</div>
+        <div class="legend-item"><div class="legend-color" style="background: var(--shift-mid);"></div>中班</div>
+        <div class="legend-item"><div class="legend-color" style="background: var(--shift-night);"></div>晚班</div>
+        <div class="legend-item"><div class="legend-color" style="background: var(--shift-off);"></div>休假</div>
+    </div>
+
+    <div class="calendar-grid" id="calendar-grid">
+        <!-- 星期標題會由 JS 產生 -->
+    </div>
+
+    <div class="stats" id="stats-display">
+        <!-- 統計數據會由 JS 產生 -->
+    </div>
+    
+    <div class="hint">💡 提示：所有排班資料會自動儲存於您的瀏覽器中。</div>
+</div>
+
+<script>
+    let currentDate = new Date();
+    
+    // 班別定義循環順序：空白 -> 早班 -> 中班 -> 晚班 -> 休假 -> 空白
+    const shifts = [
+        { key: '', label: '未排班' },
+        { key: 'early', label: '早班' },
+        { key: 'mid', label: '中班' },
+        { key: 'night', label: '晚班' },
+        { key: 'off', label: '休假' }
+    ];
+
+    function initCalendar() {
+        renderCalendar();
+    }
+
+    function changeMonth(direction) {
+        currentDate.setMonth(currentDate.getMonth() + direction);
+        renderCalendar();
+    }
+
+    function getStorageKey(year, month) {
+        return `schedule_${year}_${month}`;
+    }
+
+    function getMonthData(year, month) {
+        const data = localStorage.getItem(getStorageKey(year, month));
+        return data ? JSON.parse(data) : {};
+    }
+
+    function saveMonthData(year, month, data) {
+        localStorage.setItem(getStorageKey(year, month), JSON.stringify(data));
+    }
+
+    function renderCalendar() {
+        const year = currentDate.getFullYear();
+        const month = currentDate.getMonth();
+
+        // 設定標題
+        document.getElementById('month-year-displayinnerText', `${year} 年 ${month + 1} 月`);
+        document.getElementById('month-year-display').textContent = `${year} 年 ${month + 1} 月`;
+
+        const grid = document.getElementById('calendar-grid');
+        grid.innerHTML = '';
+
+        // 星期表頭
+        const weekdays = ['日', '一', '二', '三', '四', '五', '六'];
+        weekdays.forEach(day => {
+            const div = document.createElement('div');
+            div.className = 'weekday-header';
+            div.textContent = day;
+            grid.appendChild(div);
+        });
+
+        const firstDayIndex = new Date(year, month, 1).getDay();
+        const totalDays = new Date(year, month + 1, 0).getDate();
+        const monthData = getMonthData(year, month);
+
+        // 填充空白前置格子
+        for (let i = 0; i < firstDayIndex; i++) {
+            const emptyDiv = document.createElement('div');
+            emptyDiv.className = 'day-cell empty';
+            grid.appendChild(emptyDiv);
+        }
+
+        // 統計計數器
+        let counts = { early: 0, mid: 0, night: 0, off: 0 };
+
+        // 填充日期格子
+        for (let day = 1; day <= totalDays; day++) {
+            const cell = document.createElement('div');
+            cell.className = 'day-cell';
+            
+            const currentShiftKey = monthData[day] || '';
+            if (currentShiftKey) {
+                cell.setAttribute('data-shift', currentShiftKey);
+                if (counts[currentShiftKey] !== undefined) {
+                    counts[currentShiftKey]++;
+                }
+            }
+
+            const numberDiv = document.createElement('div');
+            numberDiv.className = 'day-number';
+            numberDiv.textContent = day;
+            cell.appendChild(numberDiv);
+
+            const tagDiv = document.createElement('div');
+            tagDiv.className = 'shift-tag';
+            const currentShiftObj = shifts.find(s => s.key === currentShiftKey);
+            tagDiv.textContent = currentShiftObj ? currentShiftObj.label : '';
+            cell.appendChild(tagDiv);
+
+            // 點擊循環切換班別
+            cell.addEventListener('click', () => {
+                const currentKey = monthData[day] || '';
+                const currentIndex = shifts.findIndex(s => s.key === currentKey);
+                const nextIndex = (currentIndex + 1) % shifts.length;
+                const nextShift = shifts[nextIndex];
+
+                if (nextShift.key === '') {
+                    delete monthData[day];
+                    cell.removeAttribute('data-shift');
+                } else {
+                    monthData[day] = nextShift.key;
+                    cell.setAttribute('data-shift', nextShift.key);
+                }
+
+                tagDiv.textContent = nextShift.key === '' ? '' : nextShift.label;
+                saveMonthData(year, month, monthData);
+                updateStats(counts);
+                // 重新渲染以正確更新統計數據
+                renderCalendar();
+            });
+
+            grid.appendChild(cell);
+        }
+
+        updateStats(counts);
+    }
+
+    function updateStats(counts) {
+        const statsDisplay = document.getElementById('stats-display');
+        statsDisplay.innerHTML = `
+            <strong>本月統計：</strong>
+            <span>早班：${counts.early} 天</span>
+            <span>中班：${counts.mid} 天</span>
+            <span>晚班：${counts.night} 天</span>
+            <span>休假：${counts.off} 天</span>
+        `;
+    }
+
+    // 初始化執行
+    initCalendar();
+</script>
+
+</body>
+</html>
