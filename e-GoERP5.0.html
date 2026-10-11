@@ -3,18 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>鼎新 e-Go ERP 5.0 - 人事排班與權限管理系統</title>
+    <title>鼎新 e-Go ERP 5.0 - 企業資源規劃系統</title>
     <style>
         :root {
-            --win-bg: #d4d0c8;            /* 經典 Windows 灰 */
+            --win-bg: #d4d0c8;
             --win-border-light: #ffffff;
             --win-border-dark: #808080;
             --win-border-darker: #404040;
-            --header-green: #005a5b;      /* 鼎新經典綠色標題列 */
+            --header-green: #005a5b;
             --header-text: #ffffff;
             --input-bg: #ffffff;
             
-            /* 班別色彩 */
             --shift-early: #c6e2ff;
             --shift-mid: #fff6c4;
             --shift-night: #ffe0b2;
@@ -28,7 +27,7 @@
         }
 
         body {
-            background-color: #3a6ea5;   /* 經典桌布藍 */
+            background-color: #3a6ea5;
             margin: 0;
             padding: 10px;
             display: flex;
@@ -37,18 +36,16 @@
             min-height: 100vh;
         }
 
-        /* 視窗外框 */
         .window {
             background-color: var(--win-bg);
             border: 2px solid;
             border-color: var(--win-border-light) var(--win-border-darker) var(--win-border-darker) var(--win-border-light);
-            box-shadow: 2px 2px 5px rgba(0,0,0,0.3);
+            box-shadow: 2px 2px 5px rgba(0,0,0,0.4);
             width: 100%;
-            max-width: 960px;
+            max-width: 1024px;
             padding: 3px;
         }
 
-        /* 視窗標題列 */
         .window-header {
             background-color: var(--header-green);
             color: var(--header-text);
@@ -79,7 +76,6 @@
             color: #000;
         }
 
-        /* ERP 功能工具列 */
         .toolbar {
             background-color: var(--win-bg);
             display: flex;
@@ -87,6 +83,7 @@
             padding: 4px 2px;
             border-bottom: 1px solid var(--win-border-dark);
             margin-bottom: 4px;
+            flex-wrap: wrap;
         }
 
         .tool-item {
@@ -94,8 +91,8 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            width: 46px;
-            height: 40px;
+            width: 50px;
+            height: 42px;
             background: var(--win-bg);
             border: 1px solid;
             border-color: var(--win-border-light) var(--win-border-dark) var(--win-border-dark) var(--win-border-light);
@@ -108,11 +105,10 @@
         }
 
         .tool-icon {
-            font-size: 14px;
+            font-size: 13px;
             margin-bottom: 2px;
         }
 
-        /* 頁籤 Tab */
         .tabs {
             display: flex;
             gap: 2px;
@@ -122,34 +118,40 @@
         }
 
         .tab {
-            padding: 4px 10px;
+            padding: 5px 12px;
             background: var(--win-bg);
             border: 1px solid;
             border-color: var(--win-border-light) var(--win-border-dark) var(--win-bg) var(--win-border-light);
             cursor: pointer;
             margin-bottom: -1px;
             font-weight: bold;
+            color: #444;
         }
 
         .tab.active {
             background: var(--win-bg);
             border-bottom: 1px solid var(--win-bg);
+            color: #000;
             z-index: 2;
         }
 
-        /* 主工作區域 */
-        .main-content {
+        .tab-content {
+            display: none;
             padding: 8px;
             border: 1px solid;
             border-color: var(--win-border-dark) var(--win-border-light) var(--win-border-light) var(--win-border-dark);
         }
 
-        /* 基本資料 GroupBox */
+        .tab-content.active {
+            display: block;
+        }
+
         .group-box {
             border: 1px solid var(--win-border-dark);
             padding: 8px;
             margin-bottom: 8px;
             position: relative;
+            background: var(--win-bg);
         }
 
         .group-title {
@@ -164,7 +166,7 @@
 
         .form-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
             gap: 6px 12px;
             margin-top: 4px;
         }
@@ -176,12 +178,12 @@
         }
 
         .form-row label {
-            width: 70px;
+            width: 80px;
             text-align: right;
             color: #000;
         }
 
-        input[type="text"], select {
+        input[type="text"], input[type="password"], select {
             border: 1px solid;
             border-color: var(--win-border-dark) var(--win-border-light) var(--win-border-light) var(--win-border-dark);
             background: var(--input-bg);
@@ -190,14 +192,13 @@
             flex: 1;
         }
 
-        /* 表格區塊 */
         .table-container {
             width: 100%;
             overflow-x: auto;
             border: 1px solid;
             border-color: var(--win-border-dark) var(--win-border-light) var(--win-border-light) var(--win-border-dark);
             background: #fff;
-            max-height: 400px;
+            max-height: 380px;
         }
 
         .erp-table {
@@ -230,7 +231,7 @@
             font-weight: bold;
             text-align: left;
             padding-left: 6px;
-            width: 100px;
+            width: 110px;
         }
 
         .erp-table th.emp-col {
@@ -238,7 +239,6 @@
             background: #d0d0d0;
         }
 
-        /* 排班點擊格子 */
         .shift-cell {
             cursor: pointer;
             user-select: none;
@@ -254,7 +254,18 @@
         .shift-cell[data-shift="night"] { background-color: var(--shift-night); color: #800000; }
         .shift-cell[data-shift="off"] { background-color: var(--shift-off); color: #606060; }
 
-        /* 狀態列 */
+        .btn-win {
+            background: var(--win-bg);
+            border: 1px solid;
+            border-color: var(--win-border-light) var(--win-border-dark) var(--win-border-dark) var(--win-border-light);
+            padding: 2px 10px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .btn-win:active {
+            border-color: var(--win-border-dark) var(--win-border-light) var(--win-border-light) var(--win-border-dark);
+        }
+
         .statusbar {
             margin-top: 4px;
             padding: 2px 6px;
@@ -272,33 +283,33 @@
 <div class="window">
     <!-- 視窗標題列 -->
     <div class="window-header">
-        <span>鼎新 e-Go ERP 5.0 - [使用者排班與考勤權限設定]</span>
+        <span>鼎新 e-Go ERP 5.0 - [企業資源規劃與人事排班整合系統]</span>
         <div class="window-controls">
             <div class="win-btn">_</div>
             <div class="win-btn">□</div>
-            <div class="win-btn" onclick="alert('離開系統')">✕</div>
+            <div class="win-btn" onclick="alert('系統已鎖定')">✕</div>
         </div>
     </div>
 
     <!-- ERP 功能工具列 -->
     <div class="toolbar">
-        <div class="tool-item" onclick="addEmployee()">
+        <div class="tool-item" onclick="addNewRecord()">
             <span class="tool-icon" style="color: green;">✚</span>
             <span>新增</span>
         </div>
-        <div class="tool-item" onclick="alert('已進入修改模式')">
+        <div class="tool-item" onclick="alert('已進入修改狀態')">
             <span class="tool-icon" style="color: blue;">✏</span>
             <span>修改</span>
         </div>
-        <div class="tool-item" onclick="deleteSelectedEmployee()">
+        <div class="tool-item" onclick="deleteCurrentRecord()">
             <span class="tool-icon" style="color: red;">✖</span>
             <span>刪除</span>
         </div>
-        <div class="tool-item" onclick="saveData()">
+        <div class="tool-item" onclick="saveAllData()">
             <span class="tool-icon" style="color: darkgreen;">💾</span>
             <span>存檔</span>
         </div>
-        <div class="tool-item" onclick="initApp()">
+        <div class="tool-item" onclick="loadAppData()">
             <span class="tool-icon" style="color: darkred;">↩</span>
             <span>放棄</span>
         </div>
@@ -306,23 +317,27 @@
             <span class="tool-icon" style="color: darkblue;">📊</span>
             <span>匯出</span>
         </div>
-        <div class="tool-item" onclick="alert('已退出作業')">
+        <div class="tool-item" onclick="alert('報表預列印中...')">
+            <span class="tool-icon" style="color: purple;">🖨</span>
+            <span>列印</span>
+        </div>
+        <div class="tool-item" onclick="alert('已登出系統')">
             <span class="tool-icon">🚪</span>
             <span>離開</span>
         </div>
     </div>
 
-    <!-- 頁籤 -->
+    <!-- 分頁標籤 Tabs -->
     <div class="tabs">
-        <div class="tab active">基本資料排班</div>
-        <div class="tab" onclick="alert('切換至模組權限頁面')">模組權限設定</div>
+        <div class="tab active" onclick="switchTab(0)">📊 1. 月曆排班大表</div>
+        <div class="tab" onclick="switchTab(1)">👥 2. 員工組織與基本資料</div>
+        <div class="tab" onclick="switchTab(2)">⚙️ 3. 系統模組與權限設定</div>
     </div>
 
-    <!-- 主工作區 -->
-    <div class="main-content">
-        <!-- 上方基本資料區 -->
+    <!-- 頁籤內容 1：排班大表 -->
+    <div id="tab-0" class="tab-content active">
         <div class="group-box">
-            <div class="group-title">基本資料 / 查詢條件</div>
+            <div class="group-title">查詢與篩選條件</div>
             <div class="form-grid">
                 <div class="form-row">
                     <label>排班年份：</label>
@@ -333,47 +348,123 @@
                     <select id="month-select" onchange="renderMatrixTable()"></select>
                 </div>
                 <div class="form-row">
-                    <label>新增員工：</label>
-                    <input type="text" id="new-emp-name" placeholder="請輸入姓名...">
-                </div>
-                <div class="form-row">
-                    <button style="height: 22px; padding: 0 8px; cursor: pointer;" onclick="addEmployee()">新增至名單</button>
+                    <button class="btn-win" onclick="renderMatrixTable()">重新整理</button>
                 </div>
             </div>
         </div>
 
-        <!-- 圖例 -->
         <div style="margin-bottom: 6px; color: #000080; font-weight: bold;">
-            操作說明：直接點擊下方對應日期的儲存格即可循環切換班別（ [空白] ➔ 早班 ➔ 中班 ➔ 晚班 ➔ 休假 ）
+            操作提示：直接點擊下方日期的儲存格可循環切換班別（空白 ➔ 早 ➔ 中 ➔ 晚 ➔ 休）
         </div>
 
-        <!-- 下方矩陣排班大表 -->
         <div class="table-container">
-            <table class="erp-table" id="schedule-table">
-                <!-- 動態產生 -->
-            </table>
+            <table class="erp-table" id="schedule-table"></table>
+        </div>
+    </div>
+
+    <!-- 頁籤內容 2：員工組織維護 -->
+    <div id="tab-1" class="tab-content">
+        <div class="group-box">
+            <div class="group-title">員工基本資料維護</div>
+            <div class="form-grid">
+                <div class="form-row">
+                    <label>員工代號：</label>
+                    <input type="text" id="emp-id" placeholder="例: P005">
+                </div>
+                <div class="form-row">
+                    <label>員工姓名：</label>
+                    <input type="text" id="emp-name" placeholder="例: 王大明">
+                </div>
+                <div class="form-row">
+                    <label>英文代稱：</label>
+                    <input type="text" id="emp-en" placeholder="例: David">
+                </div>
+                <div class="form-row">
+                    <label>部門代號：</label>
+                    <select id="emp-dept">
+                        <option value="D01 業務部">D01 業務部</option>
+                        <option value="D02 資訊部">D02 資訊部</option>
+                        <option value="D03 生管部">D03 生管部</option>
+                        <option value="D04 財務部">D04 財務部</option>
+                    </select>
+                </div>
+                <div class="form-row">
+                    <label>職稱：</label>
+                    <input type="text" id="emp-title" value="專員">
+                </div>
+                <div class="form-row">
+                    <label>密碼設定：</label>
+                    <input type="password" id="emp-pwd" value="123456">
+                </div>
+            </div>
+            <div style="margin-top: 10px; display: flex; gap: 6px;">
+                <button class="btn-win" onclick="saveEmployeeInfo()">儲存新員工</button>
+                <button class="btn-win" onclick="clearEmpForm()">清除欄位</button>
+            </div>
+        </div>
+
+        <div class="group-box">
+            <div class="group-title">現有員工清單</div>
+            <div class="table-container" style="max-height: 200px;">
+                <table class="erp-table" id="emp-list-table"></table>
+            </div>
+        </div>
+    </div>
+
+    <!-- 頁籤內容 3：系統模組權限設定 -->
+    <div id="tab-2" class="tab-content">
+        <div class="group-box">
+            <div class="group-title">程式權限與模組控管矩陣</div>
+            <p style="margin: 0 0 8px 0; color: #333;">勾選各模組對應的操作權限，並點擊下方按鈕儲存設定：</p>
+            <div class="table-container" style="max-height: 280px;">
+                <table class="erp-table" id="permission-table">
+                    <thead>
+                        <tr>
+                            <th>程式代號</th>
+                            <th>模組與功能名稱</th>
+                            <th>執行</th>
+                            <th>新增</th>
+                            <th>修改</th>
+                            <th>查詢</th>
+                            <th>刪除</th>
+                            <th>列印</th>
+                            <th>審核</th>
+                        </tr>
+                    </thead>
+                    <tbody id="permission-tbody">
+                        <!-- 動態產生 -->
+                    </tbody>
+                </table>
+            </div>
+            <div style="margin-top: 10px;">
+                <button class="btn-win" onclick="savePermissions()">儲存權限設定</button>
+            </div>
         </div>
     </div>
 
     <!-- 底部狀態列 -->
     <div class="statusbar">
-        <span>系統狀態：正常 | 模式：瀏覽/排班</span>
-        <span id="record-count">總筆數：0 筆</span>
+        <span id="status-msg">系統狀態：就緒 | 連線至 LocalStorage 資料庫</span>
+        <span id="record-count">總記錄數：0 筆</span>
     </div>
 </div>
 
 <script>
     let currentDate = new Date();
 
-    // 取得員工名單
+    // 預設員工資料
     function getEmployees() {
-        const data = localStorage.getItem('ego_employees');
-        return data ? JSON.parse(data) : ['P001 王小明', 'P002 李小華', 'P003 張大山', 'P004 陳美麗'];
+        const data = localStorage.getItem('ego_v5_emps');
+        return data ? JSON.parse(data) : [
+            { id: 'P001', name: '王小明', en: 'John', dept: 'D01 業務部', title: '高級專員' },
+            { id: 'P002', name: '李小華', en: 'Mary', dept: 'D02 資訊部', title: '工程師' },
+            { id: 'P003', name: '張大山', en: 'Mountain', dept: 'D03 生管部', title: '組長' },
+            { id: 'P004', name: '陳美麗', en: 'Lily', dept: 'D04 財務部', title: '會計' }
+        ];
     }
 
     function saveEmployees(emps) {
-        localStorage.setItem('ego_employees', JSON.stringify(emps));
-        renderMatrixTable();
+        localStorage.setItem('ego_v5_emps', JSON.stringify(emps));
     }
 
     const shifts = [
@@ -384,8 +475,15 @@
         { key: 'off', label: '休' }
     ];
 
-    function initApp() {
-        // 初始化年份下拉選單
+    // 初始化
+    function loadAppData() {
+        initYearMonthSelectors();
+        renderMatrixTable();
+        renderEmployeeList();
+        renderPermissionTable();
+    }
+
+    function initYearMonthSelectors() {
         const yearSelect = document.getElementById('year-select');
         yearSelect.innerHTML = '';
         const currentYear = currentDate.getFullYear();
@@ -397,7 +495,6 @@
             yearSelect.appendChild(opt);
         }
 
-        // 初始化月份下拉選單
         const monthSelect = document.getElementById('month-select');
         monthSelect.innerHTML = '';
         for (let m = 0; m < 12; m++) {
@@ -407,41 +504,42 @@
             if (m === currentDate.getMonth()) opt.selected = true;
             monthSelect.appendChild(opt);
         }
-
-        renderMatrixTable();
     }
 
+    // Tab 切換
+    function switchTab(index) {
+        document.querySelectorAll('.tab').forEach((t, i) => {
+            if (i === index) t.classList.add('active');
+            else t.classList.remove('active');
+        });
+        document.querySelectorAll('.tab-content').forEach((c, i) => {
+            if (i === index) c.classList.add('active');
+            else c.classList.remove('active');
+        });
+    }
+
+    // 排班矩陣表
     function getStorageKey(year, month) {
-        return `ego_schedule_${year}_${month}`;
-    }
-
-    function getMonthData(year, month) {
-        const data = localStorage.getItem(getStorageKey(year, month));
-        return data ? JSON.parse(data) : {};
-    }
-
-    function saveMonthData(year, month, data) {
-        localStorage.setItem(getStorageKey(year, month), JSON.stringify(data));
+        return `ego_v5_schedule_${year}_${month}`;
     }
 
     function renderMatrixTable() {
-        const year = parseInt(document.getElementById('year-select').value) || currentDate.getFullYear();
-        const month = parseInt(document.getElementById('month-select').value) || currentDate.getMonth();
-
+        const year = parseInt(document.getElementById('year-select').value);
+        const month = parseInt(document.getElementById('month-select').value);
         const table = document.getElementById('schedule-table');
         table.innerHTML = '';
 
         const totalDays = new Date(year, month + 1, 0).getDate();
         const employees = getEmployees();
-        const monthData = getMonthData(year, month);
+        const dataKey = getStorageKey(year, month);
+        let monthData = JSON.parse(localStorage.getItem(dataKey)) || {};
 
-        document.getElementById('record-count').textContent = `總筆數：${employees.length} 筆`;
+        document.getElementById('record-count').textContent = `總記錄數：${employees.length} 筆`;
 
-        // 建立表頭
         let headerTr = document.createElement('tr');
         let thEmp = document.createElement('th');
         thEmp.className = 'emp-col';
-        thEmp.textContent = '使用者 / 日期';
+        thEmp.textContent = '員工代號/姓名';
         headerTr.appendChild(thEmp);
 
         for (let day = 1; day <= totalDays; day++) {
@@ -449,9 +547,7 @@
             let weekDay = new Date(year, month, day).getDay();
             let weekChars = ['日', '一', '二', '三', '四', '五', '六'];
             th.innerHTML = `${day}<br><span style="font-size:10px; font-weight:normal;">${weekChars[weekDay]}</span>`;
-            if (weekDay === 0 || weekDay === 6) {
-                th.style.color = 'red';
-            }
+            if (weekDay === 0 || weekDay === 6) th.style.color = 'red';
             headerTr.appendChild(th);
         }
 
@@ -462,14 +558,14 @@
         });
         table.appendChild(headerTr);
 
-        // 填入員工排班資料
         employees.forEach(emp => {
-            if (!monthData[emp]) monthData[emp] = {};
+            let empKey = `${emp.id} ${emp.name}`;
+            if (!monthData[empKey]) monthData[empKey] = {};
 
             let tr = document.createElement('tr');
             let tdEmp = document.createElement('td');
             tdEmp.className = 'emp-col';
-            tdEmp.textContent = emp;
+            tdEmp.textContent = empKey;
             tr.appendChild(tdEmp);
 
             let counts = { early: 0, mid: 0, night: 0, off: 0 };
@@ -478,31 +574,29 @@
                 let td = document.createElement('td');
                 td.className = 'shift-cell';
                 
-                let currentKey = monthData[emp][day] || '';
-                if (currentKey && counts[currentKey] !== undefined) {
-                    counts[currentKey]++;
-                }
+                let currentKey = monthData[empKey][day] || '';
+                if (currentKey && counts[currentKey] !== undefined) counts[currentKey]++;
                 
                 let shiftObj = shifts.find(s => s.key === currentKey);
                 td.textContent = shiftObj ? shiftObj.label : '';
                 if (currentKey) td.setAttribute('data-shift', currentKey);
 
                 td.addEventListener('click', () => {
-                    let curKey = monthData[emp][day] || '';
+                    let curKey = monthData[empKey][day] || '';
                     let curIdx = shifts.findIndex(s => s.key === curKey);
                     let nextIdx = (curIdx + 1) % shifts.length;
                     let nextShift = shifts[nextIdx];
 
                     if (nextShift.key === '') {
-                        delete monthData[emp][day];
+                        delete monthData[empKey][day];
                         td.removeAttribute('data-shift');
                     } else {
-                        monthData[emp][day] = nextShift.key;
+                        monthData[empKey][day] = nextShift.key;
                         td.setAttribute('data-shift', nextShift.key);
                     }
 
                     td.textContent = nextShift.label;
-                    saveMonthData(year, month, monthData);
+                    localStorage.setItem(dataKey, JSON.stringify(monthData));
                     renderMatrixTable();
                 });
 
@@ -521,62 +615,173 @@
         });
     }
 
-    function addEmployee() {
-        const input = document.getElementById('new-emp-name');
-        const name = input.value.trim();
-        if (!name) return;
+    // 員工管理
+    function renderEmployeeList() {
+        const table = document.getElementById('emp-list-table');
+        table.innerHTML = `
+            <thead>
+                <tr>
+                    <th>員工代號</th>
+                    <th>姓名</th>
+                    <th>英文名</th>
+                    <th>部門</th>
+                    <th>職稱</th>
+                    <th>操作</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        `;
+        const tbody = table.querySelector('tbody');
+        const emps = getEmployees();
 
-        let emps = getEmployees();
-        if (emps.includes(name)) {
-            alert('使用者已存在！');
+        emps.forEach((emp, index) => {
+            let tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td>${emp.id}</td>
+                <td>${emp.name}</td>
+                <td>${emp.en}</td>
+                <td>${emp.dept}</td>
+                <td>${emp.title}</td>
+                <td><button class="btn-win" style="color:red;" onclick="deleteEmployee(${index})">刪除</button></td>
+            `;
+            tbody.appendChild(tr);
+        });
+    }
+
+    function saveEmployeeInfo() {
+        let id = document.getElementById('emp-id').value.trim();
+        let name = document.getElementById('emp-name').value.trim();
+        let en = document.getElementById('emp-en').value.trim();
+        let dept = document.getElementById('emp-dept').value;
+        let title = document.getElementById('emp-title').value.trim();
+
+        if (!id || !name) {
+            alert('請填寫員工代號與姓名！');
             return;
         }
 
-        emps.push(name);
+        let emps = getEmployees();
+        emps.push({ id, name, en, dept, title });
         saveEmployees(emps);
-        input.value = '';
+        renderEmployeeList();
+        renderMatrixTable();
+        clearEmpForm();
+        alert('員工資料新增成功！');
     }
 
-    function deleteSelectedEmployee() {
-        let name = prompt("請輸入要刪除的使用者名稱：");
-        if (!name) return;
+    function clearEmpForm() {
+        document.getElementById('emp-id').value = '';
+        document.getElementById('emp-name').value = '';
+        document.getElementById('emp-en').value = '';
+        document.getElementById('emp-title').value = '專員';
+    }
 
+    function deleteEmployee(index) {
+        if (!confirm('確定要刪除這位員工嗎？')) return;
         let emps = getEmployees();
-        if (!emps.includes(name)) {
-            alert("找不到該使用者！");
+        emps.splice(index, 1);
+        saveEmployees(emps);
+        renderEmployeeList();
+        renderMatrixTable();
+    }
+
+    function addNewRecord() {
+        switchTab(1);
+        document.getElementById('emp-id').focus();
+    }
+
+    function deleteCurrentRecord() {
+        let name = prompt('請輸入要刪除的員工姓名：');
+        if (!name) return;
+        let emps = getEmployees();
+        let newEmps = emps.filter(e => e.name !== name);
+        if (newEmps.length === emps.length) {
+            alert('找不到該員工！');
             return;
         }
-
-        emps = emps.filter(e => e !== name);
-        saveEmployees(emps);
+        saveEmployees(newEmps);
+        renderEmployeeList();
+        renderMatrixTable();
+        alert('刪除成功！');
     }
 
-    function saveData() {
-        alert("資料已成功寫入資料庫！");
+    function saveAllData() {
+        alert('資料已成功寫入 ERP 資料庫！');
     }
 
+    // 模組權限表格
+    const modules = [
+        { code: 'CMSP101', name: '人事參數設定作業' },
+        { code: 'COMP010', name: '共用資料設定系統' },
+        { code: 'PURP010', name: '採購管理子系統' },
+        { code: 'ORDP100', name: '訂單接單管理系統' },
+        { code: 'SHPP200', name: '出貨作業管理' },
+        { code: 'INVP100', name: '庫存異動與盤點' },
+        { code: 'ACTP100', name: '總帳會計管理' },
+        { code: 'TAXp100', name: '營業稅申報系統' }
+    ];
+
+    function renderPermissionTable() {
+        const tbody = document.getElementById('permission-tbody');
+        tbody.innerHTML = '';
+        let savedPerms = JSON.parse(localStorage.getItem('ego_v5_perms')) || {};
+
+        modules.forEach(m => {
+            let p = savedPerms[m.code] || { exec: true, add: true, mod: true, qry: true, del: false, prt: true, chk: false };
+            let tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td><b>${m.code}</b></td>
+                <td style="text-align:left; padding-left:8px;">${m.name}</td>
+                <td><input type="checkbox" data-code="${m.code}" data-type="exec" ${p.exec ? 'checked' : ''}></td>
+                <td><input type="checkbox" data-code="${m.code}" data-type="add" ${p.add ? 'checked' : ''}></td>
+                <td><input type="checkbox" data-code="${m.code}" data-type="mod" ${p.mod ? 'checked' : ''}></td>
+                <td><input type="checkbox" data-code="${m.code}" data-type="qry" ${p.qry ? 'checked' : ''}></td>
+                <td><input type="checkbox" data-code="${m.code}" data-type="del" ${p.del ? 'checked' : ''}></td>
+                <td><input type="checkbox" data-code="${m.code}" data-type="prt" ${p.prt ? 'checked' : ''}></td>
+                <td><input type="checkbox" data-code="${m.code}" data-type="chk" ${p.chk ? 'checked' : ''}></td>
+            `;
+            tbody.appendChild(tr);
+        });
+    }
+
+    function savePermissions() {
+        let perms = {};
+        modules.forEach(m => {
+            perms[m.code] = {
+                exec: document.querySelector(`input[data-code="${m.code}"][data-type="exec"]`).checked,
+                add: document.querySelector(`input[data-code="${m.code}"][data-type="add"]`).checked,
+                mod: document.querySelector(`input[data-code="${m.code}"][data-type="mod"]`).checked,
+                qry: document.querySelector(`input[data-code="${m.code}"][data-type="qry"]`).checked,
+                del: document.querySelector(`input[data-code="${m.code}"][data-type="del"]`).checked,
+                prt: document.querySelector(`input[data-code="${m.code}"][data-type="prt"]`).checked,
+                chk: document.querySelector(`input[data-code="${m.code}"][data-type="chk"]`).checked
+            };
+        });
+        localStorage.setItem('ego_v5_perms', JSON.stringify(perms));
+        alert('模組權限設定已成功儲存！');
+    }
+
+    // CSV 匯出
     function exportToCSV() {
         const year = parseInt(document.getElementById('year-select').value);
         const month = parseInt(document.getElementById('month-select').value);
         const totalDays = new Date(year, month + 1, 0).getDate();
         const employees = getEmployees();
-        const monthData = getMonthData(year, month);
+        const monthData = JSON.parse(localStorage.getItem(getStorageKey(year, month))) || {};
 
         let csvRows = [];
-
-        let header = ['使用者代號與姓名'];
-        for (let day = 1; day <= totalDays; day++) {
-            header.push(`${day}日`);
-        }
+        let header = ['員工代號與姓名'];
+        for (let day = 1; day <= totalDays; day++) header.push(`${day}日`);
         header.push('總早班', '總中班', '總晚班', '總休假');
         csvRows.push(header.join(','));
 
         employees.forEach(emp => {
-            let row = [ `"${emp}"` ];
+            let empKey = `${emp.id} ${emp.name}`;
+            let row = [ `"${empKey}"` ];
             let counts = { early: 0, mid: 0, night: 0, off: 0 };
 
             for (let day = 1; day <= totalDays; day++) {
-                let key = monthData[emp] && monthData[emp][day] ? monthData[emp][day] : '';
+                let key = monthData[empKey] && monthData[empKey][day] ? monthData[empKey][day] : '';
                 let label = '';
                 if (key === 'early') { label = '早'; counts.early++; }
                 else if (key === 'mid') { label = '中'; counts.mid++; }
@@ -584,7 +789,6 @@
                 else if (key === 'off') { label = '休'; counts.off++; }
                 row.push(`"${label}"`);
             }
-
             row.push(counts.early, counts.mid, counts.night, counts.off);
             csvRows.push(row.join(','));
         });
@@ -595,13 +799,14 @@
         
         const link = document.createElement('a');
         link.setAttribute('href', url);
-        link.setAttribute('download', `eGo_ERP_排班表_${year}年${month + 1}月.csv`);
+        link.setAttribute('download', `eGo_ERP_排班報表_${year}年${month + 1}月.csv`);
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
     }
 
-    initApp();
+    // 啟動執行
+    loadAppData();
 </script>
 
 </body>
