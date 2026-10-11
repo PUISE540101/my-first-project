@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>鼎新 e-GO 生產管理系統 - 辦公室專業版</title>
+  <style>
+    :root {
+      --primary: #2c3e50;
+      --secondary: #34495e;
+      --accent: #2980b9;
+      --bg: #ecf0f1;
+      --card-bg: #ffffff;
+      --text: #2c3e50;
+      --border: #bdc3c7;
+      --hover-bg: #ebf5fb;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: "Microsoft JhengHei", sans-serif; }
+    body { background-color: var(--bg); color: var(--text); display: flex; height: 100vh; overflow: hidden; }
+
+    /* 左側側邊欄 Sidebar */
+    aside {
+      width: 260px;
+      background: #1a252f;
+      color: white;
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 0;
+      box-shadow: 2px 0 8px rgba(0,0,0,0.15);
+    }
+
+    .brand {
+      padding: 18px 15px;
+      background: #111a24;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+      text-align: center;
+    }
+    .brand h2 { font-size: 1.1rem; color: #fff; }
+    .brand p { font-size: 0.75rem; color: #7f8c8d; margin-top: 4px; }
+
+    .nav-menu { flex: 1; overflow-y: auto; padding: 10px 0; }
+    .nav-section { font-size: 0.75rem; color: #7f8c8d; padding: 10px 20px 4px; font-weight: bold; }
+    
+    .nav-item {
+      display: flex;
+      align-items: center;
+      padding: 10px 20px;
+      color: #bdc3c7;
+      font-size: 0.88rem;
+      cursor: pointer;
+      border-left: 4px solid transparent;
+      transition: all 0.2s;
+    }
+    .nav-item:hover { background: rgba(255,255,255,0.05); color: #fff; }
+    .nav-item.active {
+      background: var(--accent);
+      color: #fff;
+      border-left-color: #3498db;
+      font-weight: bold;
+    }
+
+    /* 右側主要工作區 */
+    main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+
+    header {
+      height: 55px;
+      background: white;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 25px;
+    }
+    header h1 { font-size: 1.1rem; color: var(--primary); }
+    .user-info { font-size: 0.85rem; color: #7f8c8d; }
+
+    .content-body { flex: 1; padding: 20px; overflow-y: auto; }
+
+    .tab-content { display: none; }
+    .tab-content.active { display: block; animation: fadeIn 0.2s ease; }
+
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+    /* 卡片與 Grid 表單 */
+    .card {
+      background: var(--card-bg);
+      border-radius: 6px;
+      padding: 20px;
+      margin-bottom: 20px;
+      border: 1px solid var(--border);
+    }
+    .card-title {
+      font-size: 1rem;
+      color: var(--primary);
+      font-weight: bold;
+      padding-bottom: 10px;
+      margin-bottom: 15px;
+      border-bottom: 2px solid #f2f4f4;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 15px 20px;
+    }
+
+    .form-group { display: flex; flex-direction: column; }
+    .form-group label { font-size: 0.85rem; font-weight: 600; color: #444; margin-bottom: 5px; }
+    .form-group input, .form-group select, .form-group textarea {
+      padding: 8px 12px;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      font-size: 0.9rem;
+    }
+
+    .btn-group { margin-top: 15px; display: flex; gap: 10px; justify-content: flex-end; }
+    .btn {
+      padding: 8px 18px;
+      background: var(--accent);
+      color: white;
+      border: none;
+      border-radius: 4px;
+      font-size: 0.9rem;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    .btn:hover { opacity: 0.9; }
+
+    /* 表格 */
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+      font-size: 0.88rem;
+    }
+    .data-table th, .data-table td {
+      border: 1px solid var(--border);
+      padding: 8px 12px;
+      text-align: left;
+    }
+    .data-table th { background: #f8f9f9; color: #34495e; font-weight: bold; }
+    .data-table tr:hover { background: var(--hover-bg); }
+
+    /* 報表清單 */
+    .report-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 12px;
+    }
+    .report-card {
+      background: #f8f9f9;
+      border: 1px solid var(--border);
+      padding: 12px 15px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 0.88rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .report-card:hover { border-color: var(--accent); background: white; }
+  </style>
+</head>
+<body>
+
+  <!-- 左側導覽列 -->
+  <aside>
+    <div class="brand">
+      <h2>鼎新 e-GO 生產管理</h2>
+      <p>鈞陽系統整合 ‧ 電腦版</p>
+    </div>
+    <div class="nav-menu">
+      <div class="nav-section">基礎與需求計算</div>
+      <div class="nav-item active" onclick="switchTab('bom', this)">產品結構建立 (BOM)</div>
+      <div class="nav-item" onclick="switchTab('mrp', this)">物料需求計算 (MRP)</div>
+
+      <div class="nav-section">廠內生產線</div>
+      <div class="nav-item" onclick="switchTab('order', this)">製令單管理</div>
+      <div class="nav-item" onclick="switchTab('issue', this)">領料單 / 退料單</div>
+      <div class="nav-item" onclick="switchTab('stockIn', this)">生產入庫 / 退回單</div>
+
+      <div class="nav-section">託外加工線</div>
+      <div class="nav-item" onclick="switchTab('subOrder', this)">託管單管理</div>
+      <div class="nav-item" onclick="switchTab('subDelivery', this)">託工送料 / 退料單</div>
+      <div class="nav-item" onclick="switchTab('subReceipt', this)">託工進貨 / 退貨單</div>
+
+      <div class="nav-section">結算與報表</div>
+      <div class="nav-item" onclick="switchTab('cost', this)">生管成本計算</div>
+      <div class="nav-item" onclick="switchTab('reports', this)">生產管理報表中心</div>
+    </div>
+  </aside>
+
+  <!-- 右側主工作區 -->
+  <main>
+    <header>
+      <h1 id="pageTitle">產品結構建立 (BOM)</h1>
+      <div class="user-info">使用者：生管組（小黑哥） | 辦公室工作站</div>
+    </header>
+
+    <div class="content-body">
+
+      <!-- 1. BOM 產品結構建立 -->
+      <div id="bom" class="tab-content active">
+        <div class="card">
+          <div class="card-title">主件產品結構設定</div>
+          <div class="form-grid">
+            <div class="form-group">
+              <label>主件品號</label>
+              <input type="text" id="bom_code" value="PROD-001">
+            </div>
+            <div class="form-group">
+              <label>主件品名規格</label>
+              <input type="text" id="bom_name" value="標準控制盒總成">
+            </div>
+            <div class="form-group">
+              <label>標準批量</label>
+              <input type="number" id="bom_qty" value="1">
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-title">子階元件材料清單</div>
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>元件品號</th>
+                <th>品名規格</th>
+                <th>組成用量</th>
+                <th>損耗率 (%)</th>
+                <th>來源類別</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>MAT-01</td>
+                <td>鋁合金外殼</td>
+                <td>1.0</td>
+                <td>0%</td>
+                <td><span style="color:green;">廠內自製</span></td>
+              </tr>
+              <tr>
+                <td>MAT-02</td>
+                <td>PCB 控制主板</td>
+                <td>1.0</td>
+                <td>1%</td>
+                <td><span style="color:blue;">外購/託工</span></td>
+              </tr>
+            </tbody>
+          </table>
+          <div class="btn-group">
+            <button class="btn" onclick="alert('BOM 結構已儲存！')">儲存 BOM 結構</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 2. MRP 物料需求計算 -->
+      <div id="mrp" class="tab-content">
+        <div class="card">
+          <div class="card-title">執行 MRP 物料需求展算</div>
+          <div class="form-grid">
+            <div class="form-group">
+              <label>預計生產產品</label>
+              <select><option>PROD-001 - 標準控制盒總成</option></select>
+            </div>
+            <div class="form-group">
+              <label>需求數量</label>
+              <input type="number" id="mrp_qty" value="100">
+            </div>
+          </div>
+          <div class="btn-group">
+            <button class="btn" onclick="alert('MRP 展算成功！已精確計算缺料狀況。')">執行需求計算</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 3. 製令單管理 -->
+      <div id="order" class="tab-content">
+        <div class="card">
+          <div class="card-title">廠內製令單建立</div>
+          <div class="form-grid">
+            <div class="form-group"><label>製令單號</label><input type="text" value="MO-2026101201" readonly></div>
+            <div class="form-group"><label>預計開工日</label><input type="date" value="2026-10-15"></div>
+            <div class="form-group"><label>預計完工日</label><input type="date" value="2026-10-20"></div>
+            <div class="form-group"><label>預計生產數量</label><input type="number" value="100"></div>
+          </div>
+          <div class="btn-group">
+            <button class="btn" onclick="alert('製令單已建立！')">建立製令單</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 4. 領料/退料單 -->
+      <div id="issue" class="tab-content">
+        <div class="card">
+          <div class="card-title">領料單與退料作業</div>
+          <div class="form-grid">
+            <div class="form-group"><label>領料單號</label><input type="text" value="ISS-2026101201" readonly></div>
+            <div class="form-group"><label>對應製令單號</label><input type="text" value="MO-2026101201"></div>
+            <div class="form-group"><label>發料倉庫</label><select><option>主原物料倉</option></select></div>
+          </div>
+          <div class="btn-group">
+            <button class="btn" onclick="alert('領料單扣帳完成！')">確認發料扣帳</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 5. 生產入庫/退回 -->
+      <div id="stockIn" class="tab-content">
+        <div class="card">
+          <div class="card-title">生產完工入庫作業</div>
+          <div class="form-grid">
+            <div class="form-group"><label>入庫單號</label><input type="text" value="IN-2026101201" readonly></div>
+            <div class="form-group"><label>本次完工入庫量</label><input type="number" value="100"></div>
+            <div class="form-group"><label>存放倉庫</label><select><option>成品倉</option></select></div>
+          </div>
+          <div class="btn-group">
+            <button class="btn" onclick="alert('完工入庫成功！成品庫存已增加。')">確認完工入庫</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 6. 託管單管理 -->
+      <div id="subOrder" class="tab-content">
+        <div class="card">
+          <div class="card-title">託外加工託管單</div>
+          <div class="form-grid">
+            <div class="form-group"><label>託管單號</label><input type="text" value="SUB-2026101201" readonly></div>
+            <div class="form-group"><label>加工廠商</label><input type="text" placeholder="例如: 協和精密工業"></div>
+            <div class="form-group"><label>加工單價</label><input type="number" value="50"></div>
+          </div>
+          <div class="btn-group"><button class="btn" onclick="alert('託管單已開立！')">開立託管單</button></div>
+        </div>
+      </div>
+
+      <!-- 7. 託工送料/退料 -->
+      <div id="subDelivery" class="tab-content">
+        <div class="card">
+          <div class="card-title">託工送料單</div>
+          <div class="form-grid">
+            <div class="form-group"><label>送料單號</label><input type="text" value="SUD-2026101201" readonly></div>
+            <div class="form-group"><label>出貨原材料</label><input type="text" value="MAT-02 PCB 控制主板"></div>
+          </div>
+          <div class="btn-group"><button class="btn" onclick="alert('託工原材料已出貨！')">確認送料</button></div>
+        </div>
+      </div>
+
+      <!-- 8. 託工進貨/退貨 -->
+      <div id="subReceipt" class="tab-content">
+        <div class="card">
+          <div class="card-title">託工成品進貨驗收</div>
+          <div class="form-grid">
+            <div class="form-group"><label>進貨單號</label><input type="text" value="SUR-2026101201" readonly></div>
+            <div class="form-group"><label>合格數量</label><input type="number" value="100"></div>
+            <div class="form-group"><label>不良數量</label><input type="number" value="0"></div>
+          </div>
+          <div class="btn-group"><button class="btn" onclick="alert('外包進貨驗收完成！')">驗收進貨</button></div>
+        </div>
+      </div>
+
+      <!-- 9. 生管成本計算 -->
+      <div id="cost" class="tab-content">
+        <div class="card">
+          <div class="card-title">生管生產成本結算</div>
+          <div class="form-grid">
+            <div class="form-group"><label>結算月份</label><input type="month" value="2026-10"></div>
+            <div class="form-group"><label>直接材料成本</label><input type="text" value="$ 120,000" readonly></div>
+            <div class="form-group"><label>託外加工費用</label><input type="text" value="$ 25,000" readonly></div>
+          </div>
+          <div class="btn-group"><button class="btn" onclick="alert('本月生產成本計算完成！')">執行成本計算</button></div>
+        </div>
+      </div>
+
+      <!-- 10. 報表中心 -->
+      <div id="reports" class="tab-content">
+        <div class="card">
+          <div class="card-title">生產管理與託外加工報表中心</div>
+          <div class="report-grid">
+            <div class="report-card">BOM 產品結構用量表 📄</div>
+            <div class="report-card">MRP 物料需求明細表 📊</div>
+            <div class="report-card">製令單開單統計表 📋</div>
+            <div class="report-card">生產領料 / 領用明細表 📦</div>
+            <div class="report-card">生產入庫完工統計表 🏭</div>
+            <div class="report-card">託外加工委託明細表 🚚</div>
+            <div class="report-card">託工送料與庫存統計表 📦</div>
+            <div class="report-card">託工進貨驗收明細表 驗</div>
+            <div class="report-card">生產線完工進度追蹤表 ⏱️</div>
+            <div class="report-card">生管生產成本統計分析表 💰</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <script>
+    function switchTab(stepId, element) {
+      document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+      document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+      
+      document.getElementById(stepId).classList.add('active');
+      element.classList.add('active');
+
+      document.getElementById('pageTitle').innerText = element.innerText.trim();
+    }
+  </script>
+</body>
+</html>
