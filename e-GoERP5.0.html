@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>鼎新 e-Go ERP 5.0 - 企業資源規劃系統</title>
+    <title>鼎新 e-Go ERP 5.0 - 企業資源規劃與人事排班整合系統</title>
     <style>
         :root {
             --win-bg: #d4d0c8;
@@ -297,11 +297,11 @@
             <span class="tool-icon" style="color: green;">✚</span>
             <span>新增</span>
         </div>
-        <div class="tool-item" onclick="alert('已進入修改狀態')">
+        <div class="tool-item" onclick="switchTab(1)">
             <span class="tool-icon" style="color: blue;">✏</span>
             <span>修改</span>
         </div>
-        <div class="tool-item" onclick="deleteCurrentRecord()">
+        <div class="tool-item" onclick="promptDeleteEmployee()">
             <span class="tool-icon" style="color: red;">✖</span>
             <span>刪除</span>
         </div>
@@ -365,7 +365,8 @@
     <!-- 頁籤內容 2：員工組織維護 -->
     <div id="tab-1" class="tab-content">
         <div class="group-box">
-            <div class="group-title">員工基本資料維護</div>
+            <div class="group-title" id="form-title-label">員工基本資料維護 (新增模式)</div>
+            <input type="hidden" id="edit-index" value="-1">
             <div class="form-grid">
                 <div class="form-row">
                     <label>員工代號：</label>
@@ -392,19 +393,15 @@
                     <label>職稱：</label>
                     <input type="text" id="emp-title" value="專員">
                 </div>
-                <div class="form-row">
-                    <label>密碼設定：</label>
-                    <input type="password" id="emp-pwd" value="123456">
-                </div>
             </div>
             <div style="margin-top: 10px; display: flex; gap: 6px;">
-                <button class="btn-win" onclick="saveEmployeeInfo()">儲存新員工</button>
-                <button class="btn-win" onclick="clearEmpForm()">清除欄位</button>
+                <button class="btn-win" onclick="saveEmployeeInfo()" style="background-color: #d1fae5;">💾 儲存 / 更新資料</button>
+                <button class="btn-win" onclick="clearEmpForm()">清除 / 取消編輯</button>
             </div>
         </div>
 
         <div class="group-box">
-            <div class="group-title">現有員工清單</div>
+            <div class="group-title">現有員工清單 (可點擊修改或刪除)</div>
             <div class="table-container" style="max-height: 200px;">
                 <table class="erp-table" id="emp-list-table"></table>
             </div>
@@ -431,9 +428,7 @@
                             <th>審核</th>
                         </tr>
                     </thead>
-                    <tbody id="permission-tbody">
-                        <!-- 動態產生 -->
-                    </tbody>
+                    <tbody id="permission-tbody"></tbody>
                 </table>
             </div>
             <div style="margin-top: 10px;">
@@ -444,7 +439,7 @@
 
     <!-- 底部狀態列 -->
     <div class="statusbar">
-        <span id="status-msg">系統狀態：就緒 | 連線至 LocalStorage 資料庫</span>
+        <span id="status-msg">系統狀態：就緒 | 支援完整的修改與刪除作業</span>
         <span id="record-count">總記錄數：0 筆</span>
     </div>
 </div>
@@ -452,7 +447,6 @@
 <script>
     let currentDate = new Date();
 
-    // 預設員工資料
     function getEmployees() {
         const data = localStorage.getItem('ego_v5_emps');
         return data ? JSON.parse(data) : [
@@ -475,7 +469,6 @@
         { key: 'off', label: '休' }
     ];
 
-    // 初始化
     function loadAppData() {
         initYearMonthSelectors();
         renderMatrixTable();
@@ -506,7 +499,6 @@
         }
     }
 
-    // Tab 切換
     function switchTab(index) {
         document.querySelectorAll('.tab').forEach((t, i) => {
             if (i === index) t.classList.add('active');
@@ -518,7 +510,6 @@
         });
     }
 
-    // 排班矩陣表
     function getStorageKey(year, month) {
         return `ego_v5_schedule_${year}_${month}`;
     }
@@ -615,7 +606,6 @@
         });
     }
 
-    // 員工管理
     function renderEmployeeList() {
         const table = document.getElementById('emp-list-table');
         table.innerHTML = `
@@ -626,7 +616,7 @@
                     <th>英文名</th>
                     <th>部門</th>
                     <th>職稱</th>
-                    <th>操作</th>
+                    <th>功能操作</th>
                 </tr>
             </thead>
             <tbody></tbody>
@@ -642,13 +632,33 @@
                 <td>${emp.en}</td>
                 <td>${emp.dept}</td>
                 <td>${emp.title}</td>
-                <td><button class="btn-win" style="color:red;" onclick="deleteEmployee(${index})">刪除</button></td>
+                <td>
+                    <button class="btn-win" style="color:blue;" onclick="editEmployee(${index})">修改</button>
+                    <button class="btn-win" style="color:red;" onclick="deleteEmployee(${index})">刪除</button>
+                </td>
             `;
             tbody.appendChild(tr);
         });
     }
 
+    // 載入資料到上方表單進行修改
+    function editEmployee(index) {
+        let emps = getEmployees();
+        let emp = emps[index];
+
+        document.getElementById('edit-index').value = index;
+        document.getElementById('emp-id').value = emp.id;
+        document.getElementById('emp-name').value = emp.name;
+        document.getElementById('emp-en').value = emp.en;
+        document.getElementById('emp-dept').value = emp.dept;
+        document.getElementById('emp-title').value = emp.title;
+
+        document.getElementById('form-title-label').textContent = `員工基本資料維護 (修改模式 - ${emp.name})`;
+    }
+
+    // 儲存或更新員工
     function saveEmployeeInfo() {
+        let editIndex = parseInt(document.getElementById('edit-index').value);
         let id = document.getElementById('emp-id').value.trim();
         let name = document.getElementById('emp-name').value.trim();
         let en = document.getElementById('emp-en').value.trim();
@@ -661,36 +671,45 @@
         }
 
         let emps = getEmployees();
-        emps.push({ id, name, en, dept, title });
+
+        if (editIndex === -1) {
+            // 新增
+            emps.push({ id, name, en, dept, title });
+            alert('新員工新增成功！');
+        } else {
+            // 修改更新
+            emps[editIndex] = { id, name, en, dept, title };
+            alert('員工資料修改成功！');
+        }
+
         saveEmployees(emps);
         renderEmployeeList();
         renderMatrixTable();
         clearEmpForm();
-        alert('員工資料新增成功！');
     }
 
     function clearEmpForm() {
+        document.getElementById('edit-index').value = '-1';
         document.getElementById('emp-id').value = '';
         document.getElementById('emp-name').value = '';
         document.getElementById('emp-en').value = '';
         document.getElementById('emp-title').value = '專員';
+        document.getElementById('form-title-label').textContent = '員工基本資料維護 (新增模式)';
     }
 
     function deleteEmployee(index) {
-        if (!confirm('確定要刪除這位員工嗎？')) return;
         let emps = getEmployees();
+        let emp = emps[index];
+        if (!confirm(`確定要刪除員工「${emp.name}」嗎？`)) return;
+
         emps.splice(index, 1);
         saveEmployees(emps);
         renderEmployeeList();
         renderMatrixTable();
+        alert('刪除成功！');
     }
 
-    function addNewRecord() {
-        switchTab(1);
-        document.getElementById('emp-id').focus();
-    }
-
-    function deleteCurrentRecord() {
+    function promptDeleteEmployee() {
         let name = prompt('請輸入要刪除的員工姓名：');
         if (!name) return;
         let emps = getEmployees();
@@ -705,11 +724,16 @@
         alert('刪除成功！');
     }
 
+    function addNewRecord() {
+        switchTab(1);
+        clearEmpForm();
+        document.getElementById('emp-id').focus();
+    }
+
     function saveAllData() {
         alert('資料已成功寫入 ERP 資料庫！');
     }
 
-    // 模組權限表格
     const modules = [
         { code: 'CMSP101', name: '人事參數設定作業' },
         { code: 'COMP010', name: '共用資料設定系統' },
@@ -761,7 +785,6 @@
         alert('模組權限設定已成功儲存！');
     }
 
-    // CSV 匯出
     function exportToCSV() {
         const year = parseInt(document.getElementById('year-select').value);
         const month = parseInt(document.getElementById('month-select').value);
@@ -805,7 +828,6 @@
         document.body.removeChild(link);
     }
 
-    // 啟動執行
     loadAppData();
 </script>
 
