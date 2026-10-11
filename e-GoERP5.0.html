@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>鼎新 e-Go ERP 5.0 - 企業資源規劃與人事排班整合系統</title>
+    <title>鼎新 e-Go ERP 5.0 - 企業資源規劃與管理部整合旗艦系統</title>
     <style>
         :root {
             --win-bg: #d4d0c8;
@@ -40,7 +40,7 @@
             transform-origin: top center;
             transition: transform 0.1s ease;
             width: 100%;
-            max-width: 1080px;
+            max-width: 1100px;
         }
 
         .window {
@@ -98,7 +98,7 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            width: 50px;
+            width: 48px;
             height: 42px;
             background: var(--win-bg);
             border: 1px solid;
@@ -151,7 +151,7 @@
         }
 
         .tab {
-            padding: 5px 10px;
+            padding: 5px 9px;
             background: var(--win-bg);
             border: 1px solid;
             border-color: var(--win-border-light) var(--win-border-dark) var(--win-bg) var(--win-border-light);
@@ -216,7 +216,7 @@
             color: #000;
         }
 
-        input[type="text"], input[type="password"], input[type="number"], select {
+        input[type="text"], input[type="password"], input[type="number"], input[type="date"], select {
             border: 1px solid;
             border-color: var(--win-border-dark) var(--win-border-light) var(--win-border-light) var(--win-border-dark);
             background: var(--input-bg);
@@ -317,7 +317,7 @@
     <div class="window">
         <!-- 視窗標題列 -->
         <div class="window-header">
-            <span>鼎新 e-Go ERP 5.0 - [企業資源規劃與人事排班整合旗艦系統]</span>
+            <span>鼎新 e-Go ERP 5.0 - [企業資源規劃與管理部行政整合系統]</span>
             <div class="window-controls">
                 <div class="win-btn">_</div>
                 <div class="win-btn">□</div>
@@ -335,7 +335,7 @@
                 <span class="tool-icon" style="color: blue;">✏</span>
                 <span>修改</span>
             </div>
-            <div class="tool-item" onclick="switchTab(1); alert('請在下方員工清單中點擊欲刪除或修改的員工按鈕。');">
+            <div class="tool-item" onclick="switchTab(1); alert('請至對應分頁清單點擊刪除按鈕。');">
                 <span class="tool-icon" style="color: red;">✖</span>
                 <span>刪除</span>
             </div>
@@ -351,7 +351,11 @@
                 <span class="tool-icon" style="color: darkblue;">📊</span>
                 <span>匯出</span>
             </div>
-            <div class="tool-item" onclick="alert('報表預列印中...')">
+            <div class="tool-item" onclick="alert('已送出審核單據！')">
+                <span class="tool-icon" style="color: orange;">✍️</span>
+                <span>簽核</span>
+            </div>
+            <div class="tool-item" onclick="alert('報表列印預覽中...')">
                 <span class="tool-icon" style="color: purple;">🖨</span>
                 <span>列印</span>
             </div>
@@ -370,10 +374,12 @@
 
         <!-- 分頁標籤 Tabs -->
         <div class="tabs">
-            <div class="tab active" onclick="switchTab(0)">📊 1. 月曆排班大表</div>
-            <div class="tab" onclick="switchTab(1)">👥 2. 員工組織與基本資料</div>
-            <div class="tab" onclick="switchTab(2)">⚙️ 3. 系統模組與權限設定</div>
-            <div class="tab" onclick="switchTab(3)">💰 4. 出勤薪資與津貼計算</div>
+            <div class="tab active" onclick="switchTab(0)">📊 1. 排班大表</div>
+            <div class="tab" onclick="switchTab(1)">👥 2. 員工組織</div>
+            <div class="tab" onclick="switchTab(2)">⚙️ 3. 模組權限</div>
+            <div class="tab" onclick="switchTab(3)">💰 4. 薪資津貼</div>
+            <div class="tab" onclick="switchTab(4)">🏢 5. 管理部-資產設備</div>
+            <div class="tab" onclick="switchTab(5)">📄 6. 管理部-合約管理</div>
         </div>
 
         <!-- 頁籤內容 1：排班大表 -->
@@ -397,17 +403,18 @@
                             <option value="D02 資訊部">D02 資訊部</option>
                             <option value="D03 生管部">D03 生管部</option>
                             <option value="D04 財務部">D04 財務部</option>
+                            <option value="D05 管理部">D05 管理部</option>
                         </select>
                     </div>
                     <div class="form-row" style="gap: 4px;">
-                        <button class="btn-win" onclick="autoGenerateSchedule()" style="background-color: #fef08a;">⚡ 一鍵自動輪班</button>
-                        <button class="btn-win" onclick="applyWeekendOff()" style="background-color: #dbeafe;">📅 套用週休二日</button>
+                        <button class="btn-win" onclick="autoGenerateSchedule()" style="background-color: #fef08a;">⚡ 自動輪班</button>
+                        <button class="btn-win" onclick="applyWeekendOff()" style="background-color: #dbeafe;">📅 週休二日</button>
                     </div>
                 </div>
             </div>
 
             <div style="margin-bottom: 6px; color: #000080; font-weight: bold;">
-                操作提示：點擊儲存格切換班別（空白 ➔ 早 ➔ 中 ➔ 晚 ➔ 休） | 支援部門篩選與自動輪班
+                操作提示：點擊儲存格切換班別（空白 ➔ 早 ➔ 中 ➔ 晚 ➔ 休）
             </div>
 
             <div class="table-container">
@@ -440,6 +447,7 @@
                             <option value="D02 資訊部">D02 資訊部</option>
                             <option value="D03 生管部">D03 生管部</option>
                             <option value="D04 財務部">D04 財務部</option>
+                            <option value="D05 管理部">D05 管理部</option>
                         </select>
                     </div>
                     <div class="form-row">
@@ -465,7 +473,6 @@
         <div id="tab-2" class="tab-content">
             <div class="group-box">
                 <div class="group-title">程式權限與模組控管矩陣</div>
-                <p style="margin: 0 0 8px 0; color: #333;">勾選各模組對應的操作權限，並點擊下方按鈕儲存設定：</p>
                 <div class="table-container" style="max-height: 280px;">
                     <table class="erp-table" id="permission-table">
                         <thead>
@@ -530,9 +537,112 @@
             </div>
         </div>
 
+        <!-- 頁籤內容 5：管理部 - 固定資產與設備管理 -->
+        <div id="tab-4" class="tab-content">
+            <div class="group-box">
+                <div class="group-title">管理部 - 新增/維護公司資產</div>
+                <div class="form-grid">
+                    <div class="form-row">
+                        <label>資產編號：</label>
+                        <input type="text" id="asset-id" placeholder="例: AST-001">
+                    </div>
+                    <div class="form-row">
+                        <label>資產名稱：</label>
+                        <input type="text" id="asset-name" placeholder="例: 公務車 / 筆記型電腦">
+                    </div>
+                    <div class="form-row">
+                        <label>保管員工：</label>
+                        <input type="text" id="asset-owner" placeholder="例: 王小明">
+                    </div>
+                    <div class="form-row">
+                        <label>存放位置：</label>
+                        <input type="text" id="asset-loc" placeholder="例: 3F 資訊部">
+                    </div>
+                    <div class="form-row">
+                        <label>資產狀態：</label>
+                        <select id="asset-status">
+                            <option value="正常使用中">正常使用中</option>
+                            <option value="維修報修中">維修報修中</option>
+                            <option value="閒置預備">閒置預備</option>
+                            <option value="報廢">報廢</option>
+                        </select>
+                    </div>
+                </div>
+                <div style="margin-top: 10px;">
+                    <button class="btn-win" onclick="addAssetInfo()" style="background-color: #d1fae5;">➕ 新增資產</button>
+                </div>
+            </div>
+
+            <div class="group-box">
+                <div class="group-title">固定資產與總務設備清單</div>
+                <div class="table-container" style="max-height: 200px;">
+                    <table class="erp-table">
+                        <thead>
+                            <tr>
+                                <th>資產編號</th>
+                                <th>資產名稱</th>
+                                <th>保管人</th>
+                                <th>存放位置</th>
+                                <th>狀態</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="asset-tbody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- 頁籤內容 6：管理部 - 檔案與合約管理 -->
+        <div id="tab-5" class="tab-content">
+            <div class="group-box">
+                <div class="group-title">管理部 - 新增/登記公司合約</div>
+                <div class="form-grid">
+                    <div class="form-row">
+                        <label>合約編號：</label>
+                        <input type="text" id="contract-id" placeholder="例: CNT-2026-01">
+                    </div>
+                    <div class="form-row">
+                        <label>合約名稱：</label>
+                        <input type="text" id="contract-name" placeholder="例: 辦公室租賃合約">
+                    </div>
+                    <div class="form-row">
+                        <label>簽約廠商：</label>
+                        <input type="text" id="contract-vendor" placeholder="例: 鼎新實業">
+                    </div>
+                    <div class="form-row">
+                        <label>到期日期：</label>
+                        <input type="date" id="contract-exp">
+                    </div>
+                </div>
+                <div style="margin-top: 10px;">
+                    <button class="btn-win" onclick="addContractInfo()" style="background-color: #d1fae5;">📄 歸檔新合約</button>
+                </div>
+            </div>
+
+            <div class="group-box">
+                <div class="group-title">公司合約與重要文件檔案總表</div>
+                <div class="table-container" style="max-height: 200px;">
+                    <table class="erp-table">
+                        <thead>
+                            <tr>
+                                <th>合約編號</th>
+                                <th>合約名稱</th>
+                                <th>簽約對象</th>
+                                <th>到期日</th>
+                                <th>狀態提示</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="contract-tbody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
         <!-- 底部狀態列 -->
         <div class="statusbar">
-            <span id="status-msg">系統狀態：就緒 | 整合自動排班、部門篩選與薪資計算</span>
+            <span id="status-msg">系統狀態：就緒 | 已載入管理部總務、資產與合約模組</span>
             <span id="record-count">總記錄數：0 筆</span>
         </div>
     </div>
@@ -565,7 +675,8 @@
             { id: 'P001', name: '王小明', en: 'John', dept: 'D01 業務部', title: '高級專員' },
             { id: 'P002', name: '李小華', en: 'Mary', dept: 'D02 資訊部', title: '工程師' },
             { id: 'P003', name: '張大山', en: 'Mountain', dept: 'D03 生管部', title: '組長' },
-            { id: 'P004', name: '陳美麗', en: 'Lily', dept: 'D04 財務部', title: '會計' }
+            { id: 'P004', name: '陳美麗', en: 'Lily', dept: 'D04 財務部', title: '會計' },
+            { id: 'P005', name: '林行政', en: 'Boss', dept: 'D05 管理部', title: '管理主管' }
         ];
     }
 
@@ -587,6 +698,8 @@
         renderEmployeeList();
         renderPermissionTable();
         renderSalaryTable();
+        renderAssetTable();
+        renderContractTable();
     }
 
     function initYearMonthSelectors() {
@@ -628,7 +741,6 @@
         return `ego_v5_schedule_${year}_${month}`;
     }
 
-    // 渲染排班大表 (支援部門篩選)
     function renderMatrixTable() {
         const year = parseInt(document.getElementById('year-select').value);
         const month = parseInt(document.getElementById('month-select').value);
@@ -727,7 +839,6 @@
         });
     }
 
-    // ⚡ 一鍵自動輪班引擎
     function autoGenerateSchedule() {
         const year = parseInt(document.getElementById('year-select').value);
         const month = parseInt(document.getElementById('month-select').value);
@@ -743,7 +854,6 @@
             if (!monthData[empKey]) monthData[empKey] = {};
 
             for (let day = 1; day <= totalDays; day++) {
-                // 簡單輪班演算法：依據員工索引與日期錯開分配班別
                 let shiftIdx = (empIdx + day) % shiftKeys.length;
                 monthData[empKey][day] = shiftKeys[shiftIdx];
             }
@@ -754,7 +864,6 @@
         alert('⚡ 自動輪班排班完畢！');
     }
 
-    // 📅 套用週休二日範本
     function applyWeekendOff() {
         const year = parseInt(document.getElementById('year-select').value);
         const month = parseInt(document.getElementById('month-select').value);
@@ -770,9 +879,9 @@
             for (let day = 1; day <= totalDays; day++) {
                 let weekDay = new Date(year, month, day).getDay();
                 if (weekDay === 0 || weekDay === 6) {
-                    monthData[empKey][day] = 'off'; // 六日設為休
+                    monthData[empKey][day] = 'off';
                 } else if (!monthData[empKey][day]) {
-                    monthData[empKey][day] = 'early'; // 平日預設早班
+                    monthData[empKey][day] = 'early';
                 }
             }
         });
@@ -782,7 +891,6 @@
         alert('📅 週休二日範本套用完畢！');
     }
 
-    // 渲染薪資與津貼結算表
     function renderSalaryTable() {
         const year = parseInt(document.getElementById('year-select').value);
         const month = parseInt(document.getElementById('month-select').value);
@@ -823,7 +931,110 @@
         });
     }
 
-    // 員工管理與其他基礎功能
+    // --- 管理部：固定資產管理邏輯 ---
+    function getAssets() {
+        const data = localStorage.getItem('ego_v5_assets');
+        return data ? JSON.parse(data) : [
+            { id: 'AST-001', name: '公務車 (CAMRY)', owner: '王小明', loc: '地下停車場', status: '正常使用中' },
+            { id: 'AST-002', name: '開發用 Laptop', owner: '李小華', loc: '3F 資訊部', status: '正常使用中' }
+        ];
+    }
+
+    function renderAssetTable() {
+        const tbody = document.getElementById('asset-tbody');
+        tbody.innerHTML = '';
+        const assets = getAssets();
+
+        assets.forEach((ast, idx) => {
+            let tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td><b>${ast.id}</b></td>
+                <td>${ast.name}</td>
+                <td>${ast.owner}</td>
+                <td>${ast.loc}</td>
+                <td>${ast.status}</td>
+                <td><button class="btn-win" style="color:red;" onclick="deleteAsset(${idx})">刪除</button></td>
+            `;
+            tbody.appendChild(tr);
+        });
+    }
+
+    function addAssetInfo() {
+        let id = document.getElementById('asset-id').value.trim();
+        let name = document.getElementById('asset-name').value.trim();
+        let owner = document.getElementById('asset-owner').value.trim();
+        let loc = document.getElementById('asset-loc').value.trim();
+        let status = document.getElementById('asset-status').value;
+
+        if (!id || !name) { alert('請填寫資產編號與名稱！'); return; }
+
+        let assets = getAssets();
+        assets.push({ id, name, owner, loc, status });
+        localStorage.setItem('ego_v5_assets', JSON.stringify(assets));
+        renderAssetTable();
+        alert('新增資產成功！');
+    }
+
+    function deleteAsset(idx) {
+        if (!confirm('確定要刪除這筆資產嗎？')) return;
+        let assets = getAssets();
+        assets.splice(idx, 1);
+        localStorage.setItem('ego_v5_assets', JSON.stringify(assets));
+        renderAssetTable();
+    }
+
+    // --- 管理部：合約管理邏輯 ---
+    function getContracts() {
+        const data = localStorage.getItem('ego_v5_contracts');
+        return data ? JSON.parse(data) : [
+            { id: 'CNT-2026-01', name: '3F 辦公室租賃合約', vendor: '台北國泰大樓', exp: '2026-12-31' },
+            { id: 'CNT-2026-02', name: '影印機月租保養合約', vendor: '台灣富士全錄', exp: '2026-11-15' }
+        ];
+    }
+
+    function renderContractTable() {
+        const tbody = document.getElementById('contract-tbody');
+        tbody.innerHTML = '';
+        const contracts = getContracts();
+
+        contracts.forEach((cnt, idx) => {
+            let tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td><b>${cnt.id}</b></td>
+                <td>${cnt.name}</td>
+                <td>${cnt.vendor}</td>
+                <td>${cnt.exp}</td>
+                <td><span style="color:green; font-weight:bold;">履約中</span></td>
+                <td><button class="btn-win" style="color:red;" onclick="deleteContract(${idx})">刪除</button></td>
+            `;
+            tbody.appendChild(tr);
+        });
+    }
+
+    function addContractInfo() {
+        let id = document.getElementById('contract-id').value.trim();
+        let name = document.getElementById('contract-name').value.trim();
+        let vendor = document.getElementById('contract-vendor').value.trim();
+        let exp = document.getElementById('contract-exp').value;
+
+        if (!id || !name) { alert('請填寫合約編號與名稱！'); return; }
+
+        let contracts = getContracts();
+        contracts.push({ id, name, vendor, exp });
+        localStorage.setItem('ego_v5_contracts', JSON.stringify(contracts));
+        renderContractTable();
+        alert('合約歸檔成功！');
+    }
+
+    function deleteContract(idx) {
+        if (!confirm('確定要刪除這筆合約紀錄嗎？')) return;
+        let contracts = getContracts();
+        contracts.splice(idx, 1);
+        localStorage.setItem('ego_v5_contracts', JSON.stringify(contracts));
+        renderContractTable();
+    }
+
+    // 員工管理
     function renderEmployeeList() {
         const table = document.getElementById('emp-list-table');
         table.innerHTML = `
@@ -936,12 +1147,12 @@
     const modules = [
         { code: 'CMSP101', name: '人事參數設定作業' },
         { code: 'COMP010', name: '共用資料設定系統' },
+        { code: 'ASTP100', name: '管理部-固定資產管理' },
+        { code: 'CONP100', name: '管理部-企業合約管理' },
+        { code: 'DOCP200', name: '管理部-公文電子簽核' },
         { code: 'PURP010', name: '採購管理子系統' },
         { code: 'ORDP100', name: '訂單接單管理系統' },
-        { code: 'SHPP200', name: '出貨作業管理' },
-        { code: 'INVP100', name: '庫存異動與盤點' },
-        { code: 'ACTP100', name: '總帳會計管理' },
-        { code: 'TAXp100', name: '營業稅申報系統' }
+        { code: 'ACTP100', name: '總帳會計管理' }
     ];
 
     function renderPermissionTable() {
@@ -1021,7 +1232,7 @@
         
         const link = document.createElement('a');
         link.setAttribute('href', url);
-        link.setAttribute('download', `eGo_ERP_排班與薪資報表_${year}年${month + 1}月.csv`);
+        link.setAttribute('download', `eGo_ERP_管理部綜合報表_${year}年${month + 1}月.csv`);
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
