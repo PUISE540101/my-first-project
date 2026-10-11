@@ -301,7 +301,7 @@
             <span class="tool-icon" style="color: blue;">✏</span>
             <span>修改</span>
         </div>
-        <div class="tool-item" onclick="promptDeleteEmployee()">
+        <div class="tool-item" onclick="switchTab(1); alert('請在下方員工清單中點擊欲刪除或修改的員工按鈕。');">
             <span class="tool-icon" style="color: red;">✖</span>
             <span>刪除</span>
         </div>
@@ -401,7 +401,7 @@
         </div>
 
         <div class="group-box">
-            <div class="group-title">現有員工清單 (可點擊修改或刪除)</div>
+            <div class="group-title">現有員工清單 (點擊「修改」或「刪除」按鈕)</div>
             <div class="table-container" style="max-height: 200px;">
                 <table class="erp-table" id="emp-list-table"></table>
             </div>
@@ -439,7 +439,7 @@
 
     <!-- 底部狀態列 -->
     <div class="statusbar">
-        <span id="status-msg">系統狀態：就緒 | 支援完整的修改與刪除作業</span>
+        <span id="status-msg">系統狀態：就緒 | 支援直覺化的修改與刪除作業</span>
         <span id="record-count">總記錄數：0 筆</span>
     </div>
 </div>
@@ -641,7 +641,6 @@
         });
     }
 
-    // 載入資料到上方表單進行修改
     function editEmployee(index) {
         let emps = getEmployees();
         let emp = emps[index];
@@ -654,9 +653,9 @@
         document.getElementById('emp-title').value = emp.title;
 
         document.getElementById('form-title-label').textContent = `員工基本資料維護 (修改模式 - ${emp.name})`;
+        switchTab(1); // 自動跳轉至員工維護分頁
     }
 
-    // 儲存或更新員工
     function saveEmployeeInfo() {
         let editIndex = parseInt(document.getElementById('edit-index').value);
         let id = document.getElementById('emp-id').value.trim();
@@ -673,11 +672,9 @@
         let emps = getEmployees();
 
         if (editIndex === -1) {
-            // 新增
             emps.push({ id, name, en, dept, title });
             alert('新員工新增成功！');
         } else {
-            // 修改更新
             emps[editIndex] = { id, name, en, dept, title };
             alert('員工資料修改成功！');
         }
@@ -700,25 +697,10 @@
     function deleteEmployee(index) {
         let emps = getEmployees();
         let emp = emps[index];
-        if (!confirm(`確定要刪除員工「${emp.name}」嗎？`)) return;
+        if (!confirm(`確定要刪除員工「${emp.name} (${emp.id})」嗎？`)) return;
 
         emps.splice(index, 1);
         saveEmployees(emps);
-        renderEmployeeList();
-        renderMatrixTable();
-        alert('刪除成功！');
-    }
-
-    function promptDeleteEmployee() {
-        let name = prompt('請輸入要刪除的員工姓名：');
-        if (!name) return;
-        let emps = getEmployees();
-        let newEmps = emps.filter(e => e.name !== name);
-        if (newEmps.length === emps.length) {
-            alert('找不到該員工！');
-            return;
-        }
-        saveEmployees(newEmps);
         renderEmployeeList();
         renderMatrixTable();
         alert('刪除成功！');
