@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>月歷排班與人事管理系統</title>
+    <style>
+        :root {
+            --primary-color: #3b82f6;
+            --bg-color: #f8fafc;
+            --card-bg: #ffffff;
+            --text-color: #1e293b;
+            --border-color: #e2e8f0;
+            
+            /* 班別顏色 */
+            --shift-early: #dbeafe;   /* 早班 - 藍 */
+            --shift-mid: #fef08a;     /* 中班 - 黃 */
+            --shift-night: #fed7aa;   /* 晚班 - 橘 */
+            --shift-off: #f1f5f9;     /* 休假 - 灰 */
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 600px;
+            background: var(--card-bg);
+            padding: 14px;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px -1px rgb(0 0 0 / 0.1);
+        }
+
+        .nav-tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 12px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 8px;
+        }
+
+        .tab-btn {
+            background: none;
+            border: none;
+            padding: 6px 12px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            color: #64748b;
+            border-radius: 6px;
+        }
+
+        .tab-btn.active {
+            background-color: var(--primary-color);
+            color: #fff;
+        }
+
+        .view-section {
+            display: none;
+        }
+
+        .view-section.active {
+            display: block;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        h1 {
+            margin: 0;
+            font-size: 1.15rem;
+        }
+
+        .btn-group button, .action-btn {
+            background-color: #fff;
+            border: 1px solid var(--border-color);
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: background 0.2s;
+        }
+
+        .btn-group button:hover, .action-btn:hover {
+            background-color: #f1f5f9;
+        }
+
+        .control-row {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 12px;
+            align-items: center;
+        }
+
+        select {
+            padding: 6px 10px;
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+            font-size: 0.85rem;
+            background: #fff;
+            flex-grow: 1;
+        }
+
+        .legend {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 12px;
+            font-size: 0.8rem;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .legend-color {
+            width: 12px;
+            height: 12px;
+            border-radius: 3px;
+        }
+
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 4px;
+        }
+
+        .weekday-header {
+            text-align: center;
+            font-weight: 600;
+            color: #64748b;
+            padding: 4px 0;
+            font-size: 0.8rem;
+        }
+
+        .day-cell {
+            aspect-ratio: 1;
+            background-color: #fff;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 4px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+        }
+
+        .day-cell:hover {
+            border-color: var(--primary-color);
+        }
+
+        .day-cell.empty {
+            background-color: transparent;
+            border: none;
+            cursor: default;
+            box-shadow: none;
+        }
+
+        .day-number {
+            font-weight: 600;
+            font-size: 0.8rem;
+        }
+
+        .shift-tag {
+            font-size: 0.7rem;
+            text-align: center;
+            padding: 2px 0;
+            border-radius: 3px;
+            font-weight: 500;
+        }
+
+        /* 班別狀態顏色 */
+        .day-cell[data-shift="early"] { background-color: var(--shift-early); border-color: #93c5fd; }
+        .day-cell[data-shift="mid"] { background-color: var(--shift-mid); border-color: #fde047; }
+        .day-cell[data-shift="night"] { background-color: var(--shift-night); border-color: #fdba74; }
+        .day-cell[data-shift="off"] { background-color: var(--shift-off); border-color: #cbd5e1; color: #94a3b8; }
+
+        .stats {
+            margin-top: 12px;
+            padding-top: 10px;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            font-size: 0.8rem;
+            color: #475569;
+        }
+
+        /* HR 後台樣式 */
+        .hr-section {
+            margin-bottom: 16px;
+        }
+
+        .hr-section h3 {
+            font-size: 0.95rem;
+            margin-bottom: 8px;
+            color: #334155;
+        }
+
+        .employee-list {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            max-height: 150px;
+            overflow-y: auto;
+            margin-bottom: 12px;
+        }
+
+        .employee-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 6px 10px;
+            background: #f1f5f9;
+            border-radius: 6px;
+            font-size: 0.85rem;
+        }
+
+        .delete-btn {
+            background: #ef4444;
+            color: #fff;
+            border: none;
+            padding: 3px 8px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.75rem;
+        }
+
+        .add-emp-form {
+            display: flex;
+            gap: 6px;
+        }
+
+        .add-emp-form input {
+            flex-grow: 1;
+            padding: 6px 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 0.85rem;
+        }
+
+        .add-emp-form button {
+            background: var(--primary-color);
+            color: #fff;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.85rem;
+        }
+
+        .hr-summary-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.8rem;
+            margin-top: 8px;
+        }
+
+        .hr-summary-table th, .hr-summary-table td {
+            border: 1px solid var(--border-color);
+            padding: 6px;
+            text-align: center;
+        }
+
+        .hr-summary-table th {
+            background-color: #f1f5f9;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <!-- 切換視圖導覽 -->
+    <div class="nav-tabs">
+        <button class="tab-btn active" onclick="switchView('frontend')">📅 員工排班檢視</button>
+        <button class="tab-btn" onclick="switchView('backend')">⚙️ 人事管理後台</button>
+    </div>
+
+    <!-- 員工排班檢視 (前台) -->
+    <div id="frontend-view" class="view-section active">
+        <header>
+            <div class="btn-group">
+                <button onclick="changeMonth(-1)">◀ 上月</button>
+            </div>
+            <h1 id="month-year-display"></h1>
+            <div class="btn-group">
+                <button onclick="changeMonth(1)">下月 ▶</button>
+            </div>
+        </header>
+
+        <div class="control-row">
+            <label style="font-size: 0.85rem; font-weight: 600;">選擇員工：</label>
+            <select id="employee-select" onchange="renderCalendar()"></select>
+        </div>
+
+        <div class="legend">
+            <span>點擊切換：</span>
+            <div class="legend-item"><div class="legend-color" style="background: var(--shift-early);"></div>早</div>
+            <div class="legend-item"><div class="legend-color" style="background: var(--shift-mid);"></div>中</div>
+            <div class="legend-item"><div class="legend-color" style="background: var(--shift-night);"></div>晚</div>
+            <div class="legend-item"><div class="legend-color" style="background: var(--shift-off);"></div>休</div>
+        </div>
+
+        <div class="calendar-grid" id="calendar-grid"></div>
+
+        <div class="stats" id="stats-display"></div>
+    </div>
+
+    <!-- 人事管理後台 -->
+    <div id="backend-view" class="view-section">
+        <header>
+            <h1>人事管理後台</h1>
+        </header>
+
+        <div class="hr-section">
+            <h3>員工名單管理</h3>
+            <div class="employee-list" id="hr-employee-list"></div>
+            <div class="add-emp-form">
+                <input type="text" id="new-emp-name" placeholder="輸入新員工姓名...">
+                <button onclick="addEmployee()">新增員工</button>
+            </div>
+        </div>
+
+        <div class="hr-section">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                <h3 style="margin: 0;" id="hr-summary-title">當月出勤總計</h3>
+                <div class="btn-group">
+                    <button onclick="changeHrMonth(-1)">◀</button>
+                    <button onclick="changeHrMonth(1)">▶</button>
+                </div>
+            </div>
+            <table class="hr-summary-table">
+                <thead>
+                    <tr>
+                        <th>員工</th>
+                        <th>早</th>
+                        <th>中</th>
+                        <th>晚</th>
+                        <th>休</th>
+                    </tr>
+                </thead>
+                <tbody id="hr-summary-tbody">
+                    <!-- 動態產生 -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+    let currentDate = new Date();
+    let hrDate = new Date();
+
+    // 預設員工資料
+    function getEmployees() {
+        const data = localStorage.getItem('employees');
+        return data ? JSON.parse(data) : ['王小明', '李小華', '張大山'];
+    }
+
+    function saveEmployees(emps) {
+        localStorage.setItem('employees', JSON.stringify(emps));
+        initEmployeeSelect();
+    }
+
+    const shifts = [
+        { key: '', label: '' },
+        { key: 'early', label: '早班' },
+        { key: 'mid', label: '中班' },
+        { key: 'night', label: '晚班' },
+        { key: 'off', label: '休假' }
+    ];
+
+    function switchView(viewName) {
+        document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
+        document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+
+        if (viewName === 'frontend') {
+            document.getElementById('frontend-view').classList.add('active');
+            event.target.classList.add('active');
+            renderCalendar();
+        } else {
+            document.getElementById('backend-view').classList.add('active');
+            event.target.classList.add('active');
+            renderHrBackend();
+        }
+    }
+
+    function initEmployeeSelect() {
+        const select = document.getElementById('employee-select');
+        const emps = getEmployees();
+        const currentSelected = select.value;
+
+        select.innerHTML = '';
+        emps.forEach(emp => {
+            const opt = document.createElement('option');
+            opt.value = emp;
+            opt.textContent = emp;
+            select.appendChild(opt);
+        });
+
+        if (emps.includes(currentSelected)) {
+            select.value = currentSelected;
+        }
+    }
+
+    // --- 前台排班邏輯 ---
+    function changeMonth(direction) {
+        currentDate.setMonth(currentDate.getMonth() + direction);
+        renderCalendar();
+    }
+
+    function getStorageKey(emp, year, month) {
+        return `schedule_${emp}_${year}_${month}`;
+    }
+
+    function getMonthData(emp, year, month) {
+        const data = localStorage.getItem(getStorageKey(emp, year, month));
+        return data ? JSON.parse(data) : {};
+    }
+
+    function saveMonthData(emp, year, month, data) {
+        localStorage.setItem(getStorageKey(emp, year, month), JSON.stringify(data));
+    }
+
+    function renderCalendar() {
+        const year = currentDate.getFullYear();
+        const month = currentDate.getMonth();
+        const emp = document.getElementById('employee-select').value;
+
+        document.getElementById('month-year-display').textContent = `${year} 年 ${month + 1} 月`;
+
+        const grid = document.getElementById('calendar-grid');
+        grid.innerHTML = '';
+
+        const weekdays = ['日', '一', '二', '三', '四', '五', '六'];
+        weekdays.forEach(day => {
+            const div = document.createElement('div');
+            div.className = 'weekday-header';
+            div.textContent = day;
+            grid.appendChild(div);
+        });
+
+        const firstDayIndex = new Date(year, month, 1).getDay();
+        const totalDays = new Date(year, month + 1, 0).getDate();
+        const monthData = getMonthData(emp, year, month);
+
+        for (let i = 0; i < firstDayIndex; i++) {
+            const emptyDiv = document.createElement('div');
+            emptyDiv.className = 'day-cell empty';
+            grid.appendChild(emptyDiv);
+        }
+
+        let counts = { early: 0, mid: 0, night: 0, off: 0 };
+
+        for (let day = 1; day <= totalDays; day++) {
+            const cell = document.createElement('div');
+            cell.className = 'day-cell';
+            
+            const currentShiftKey = monthData[day] || '';
+            if (currentShiftKey) {
+                cell.setAttribute('data-shift', currentShiftKey);
+                if (counts[currentShiftKey] !== undefined) {
+                    counts[currentShiftKey]++;
+                }
+            }
+
+            const numberDiv = document.createElement('div');
+            numberDiv.className = 'day-number';
+            numberDiv.textContent = day;
+            cell.appendChild(numberDiv);
+
+            const tagDiv = document.createElement('div');
+            tagDiv.className = 'shift-tag';
+            const currentShiftObj = shifts.find(s => s.key === currentShiftKey);
+            tagDiv.textContent = currentShiftObj ? currentShiftObj.label : '';
+            cell.appendChild(tagDiv);
+
+            cell.addEventListener('click', () => {
+                const currentKey = monthData[day] || '';
+                const currentIndex = shifts.findIndex(s => s.key === currentKey);
+                const nextIndex = (currentIndex + 1) % shifts.length;
+                const nextShift = shifts[nextIndex];
+
+                if (nextShift.key === '') {
+                    delete monthData[day];
+                    cell.removeAttribute('data-shift');
+                } else {
+                    monthData[day] = nextShift.key;
+                    cell.setAttribute('data-shift', nextShift.key);
+                }
+
+                tagDiv.textContent = nextShift.label;
+                saveMonthData(emp, year, month, monthData);
+                renderCalendar();
+            });
+
+            grid.appendChild(cell);
+        }
+
+        updateStats(counts);
+    }
+
+    function updateStats(counts) {
+        const statsDisplay = document.getElementById('stats-display');
+        statsDisplay.innerHTML = `
+            <strong>本月統計：</strong>
+            <span>早：${counts.early}</span>
+            <span>中：${counts.mid}</span>
+            <span>晚：${counts.night}</span>
+            <span>休：${counts.off}</span>
+        `;
+    }
+
+    // --- 人事後台邏輯 ---
+    function initHrBackend() {
+        renderEmployeeList();
+        renderHrSummary();
+    }
+
+    function renderEmployeeList() {
+        const listEl = document.getElementById('hr-employee-list');
+        const emps = getEmployees();
+        listEl.innerHTML = '';
+
+        emps.forEach(emp => {
+            const item = document.createElement('div');
+            item.className = 'employee-item';
+            item.innerHTML = `
+                <span>${emp}</span>
+                <button class="delete-btn" onclick="deleteEmployee('${emp}')">刪除</button>
+            `;
+            listEl.appendChild(item);
+        });
+    }
+
+    function addEmployee() {
+        const input = document.getElementById('new-emp-name');
+        const name = input.value.trim();
+        if (!name) return;
+
+        let emps = getEmployees();
+        if (emps.includes(name)) {
+            alert('這位員工已經存在！');
+            return;
+        }
+
+        emps.push(name);
+        saveEmployees(emps);
+        input.value = '';
+        renderHrBackend();
+    }
+
+    function deleteEmployee(name) {
+        if (!confirm(`確定要刪除員工「${name}」嗎？`)) return;
+        let emps = getEmployees();
+        emps = emps.filter(e => e !== name);
+        saveEmployees(emps);
+        renderHrBackend();
+    }
+
+    function changeHrMonth(direction) {
+        hrDate.setMonth(hrDate.getMonth() + direction);
+        renderHrSummary();
+    }
+
+    function renderHrSummary() {
+        const year = hrDate.getFullYear();
+        const month = hrDate.getMonth();
+        document.getElementById('hr-summary-title').textContent = `${year} 年 ${month + 1} 月出勤總計`;
+
+        const tbody = document.getElementById('hr-summary-tbody');
+        tbody.innerHTML = '';
+        const emps = getEmployees();
+
+        emps.forEach(emp => {
+            const monthData = getMonthData(emp, year, month);
+            let counts = { early: 0, mid: 0, night: 0, off: 0 };
+            
+            Object.values(monthData).forEach(shift => {
+                if (counts[shift] !== undefined) counts[shift]++;
+            });
+
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${emp}</td>
+                <td>${counts.early}</td>
+                <td>${counts.mid}</td>
+                <td>${counts.night}</td>
+                <td>${counts.off}</td>
+            `;
+            tbody.appendChild(row);
+        });
+    }
+
+    // 初始化
+    initEmployeeSelect();
+    renderCalendar();
+</script>
+
+</body>
+</html>
