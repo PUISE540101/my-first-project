@@ -36,12 +36,11 @@
             min-height: 100vh;
         }
 
-        /* 外層包覆容器，支援整體縮放 */
         .zoom-wrapper {
             transform-origin: top center;
             transition: transform 0.1s ease;
             width: 100%;
-            max-width: 1024px;
+            max-width: 1080px;
         }
 
         .window {
@@ -117,7 +116,6 @@
             margin-bottom: 2px;
         }
 
-        /* 縮放控制群組 */
         .zoom-group {
             display: flex;
             align-items: center;
@@ -142,9 +140,6 @@
             align-items: center;
             justify-content: center;
         }
-        .zoom-btn:active {
-            border-color: var(--win-border-dark) var(--win-border-light) var(--win-border-light) var(--win-border-dark);
-        }
 
         .tabs {
             display: flex;
@@ -152,10 +147,11 @@
             margin-top: 4px;
             border-bottom: 1px solid var(--win-border-dark);
             padding-left: 4px;
+            flex-wrap: wrap;
         }
 
         .tab {
-            padding: 5px 12px;
+            padding: 5px 10px;
             background: var(--win-bg);
             border: 1px solid;
             border-color: var(--win-border-light) var(--win-border-dark) var(--win-bg) var(--win-border-light);
@@ -203,7 +199,7 @@
 
         .form-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             gap: 6px 12px;
             margin-top: 4px;
         }
@@ -220,7 +216,7 @@
             color: #000;
         }
 
-        input[type="text"], input[type="password"], select {
+        input[type="text"], input[type="password"], input[type="number"], select {
             border: 1px solid;
             border-color: var(--win-border-dark) var(--win-border-light) var(--win-border-light) var(--win-border-dark);
             background: var(--input-bg);
@@ -321,7 +317,7 @@
     <div class="window">
         <!-- 視窗標題列 -->
         <div class="window-header">
-            <span>鼎新 e-Go ERP 5.0 - [企業資源規劃與人事排班整合系統]</span>
+            <span>鼎新 e-Go ERP 5.0 - [企業資源規劃與人事排班整合旗艦系統]</span>
             <div class="window-controls">
                 <div class="win-btn">_</div>
                 <div class="win-btn">□</div>
@@ -364,11 +360,10 @@
                 <span>離開</span>
             </div>
 
-            <!-- 畫面縮放控制區 -->
             <div class="zoom-group">
                 <span style="font-weight: bold; margin-right: 2px;">顯示比例:</span>
                 <button class="zoom-btn" onclick="adjustZoom(-0.1)" title="縮小">-</button>
-                <button class="zoom-btn" onclick="resetZoom()" title="重設為 100%" id="zoom-display" style="width: 45px;">100%</button>
+                <button class="zoom-btn" onclick="resetZoom()" title="重設" id="zoom-display" style="width: 42px;">100%</button>
                 <button class="zoom-btn" onclick="adjustZoom(0.1)" title="放大">+</button>
             </div>
         </div>
@@ -378,12 +373,13 @@
             <div class="tab active" onclick="switchTab(0)">📊 1. 月曆排班大表</div>
             <div class="tab" onclick="switchTab(1)">👥 2. 員工組織與基本資料</div>
             <div class="tab" onclick="switchTab(2)">⚙️ 3. 系統模組與權限設定</div>
+            <div class="tab" onclick="switchTab(3)">💰 4. 出勤薪資與津貼計算</div>
         </div>
 
         <!-- 頁籤內容 1：排班大表 -->
         <div id="tab-0" class="tab-content active">
             <div class="group-box">
-                <div class="group-title">查詢與篩選條件</div>
+                <div class="group-title">查詢與智慧排班條件</div>
                 <div class="form-grid">
                     <div class="form-row">
                         <label>排班年份：</label>
@@ -394,13 +390,24 @@
                         <select id="month-select" onchange="renderMatrixTable()"></select>
                     </div>
                     <div class="form-row">
-                        <button class="btn-win" onclick="renderMatrixTable()">重新整理</button>
+                        <label>部門篩選：</label>
+                        <select id="dept-filter" onchange="renderMatrixTable()">
+                            <option value="ALL">全部門</option>
+                            <option value="D01 業務部">D01 業務部</option>
+                            <option value="D02 資訊部">D02 資訊部</option>
+                            <option value="D03 生管部">D03 生管部</option>
+                            <option value="D04 財務部">D04 財務部</option>
+                        </select>
+                    </div>
+                    <div class="form-row" style="gap: 4px;">
+                        <button class="btn-win" onclick="autoGenerateSchedule()" style="background-color: #fef08a;">⚡ 一鍵自動輪班</button>
+                        <button class="btn-win" onclick="applyWeekendOff()" style="background-color: #dbeafe;">📅 套用週休二日</button>
                     </div>
                 </div>
             </div>
 
             <div style="margin-bottom: 6px; color: #000080; font-weight: bold;">
-                操作提示：直接點擊下方日期的儲存格可循環切換班別（空白 ➔ 早 ➔ 中 ➔ 晚 ➔ 休）
+                操作提示：點擊儲存格切換班別（空白 ➔ 早 ➔ 中 ➔ 晚 ➔ 休） | 支援部門篩選與自動輪班
             </div>
 
             <div class="table-container">
@@ -483,9 +490,49 @@
             </div>
         </div>
 
+        <!-- 頁籤內容 4：出勤薪資與津貼計算 -->
+        <div id="tab-3" class="tab-content">
+            <div class="group-box">
+                <div class="group-title">班別津貼標準設定</div>
+                <div class="form-grid">
+                    <div class="form-row">
+                        <label>早班津貼/天：</label>
+                        <input type="number" id="pay-early" value="200" onchange="renderSalaryTable()">
+                    </div>
+                    <div class="form-row">
+                        <label>中班津貼/天：</label>
+                        <input type="number" id="pay-mid" value="400" onchange="renderSalaryTable()">
+                    </div>
+                    <div class="form-row">
+                        <label>晚班津貼/天：</label>
+                        <input type="number" id="pay-night" value="600" onchange="renderSalaryTable()">
+                    </div>
+                </div>
+            </div>
+
+            <div class="group-box">
+                <div class="group-title">當月員工薪資與津貼結算總表</div>
+                <div class="table-container" style="max-height: 240px;">
+                    <table class="erp-table" id="salary-table">
+                        <thead>
+                            <tr>
+                                <th>員工代號/姓名</th>
+                                <th>早班天數</th>
+                                <th>中班天數</th>
+                                <th>晚班天數</th>
+                                <th>休假天數</th>
+                                <th>總津貼金額 (NT$)</th>
+                            </tr>
+                        </thead>
+                        <tbody id="salary-tbody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
         <!-- 底部狀態列 -->
         <div class="statusbar">
-            <span id="status-msg">系統狀態：就緒 | 支援畫面自由縮放與完整資料維護</span>
+            <span id="status-msg">系統狀態：就緒 | 整合自動排班、部門篩選與薪資計算</span>
             <span id="record-count">總記錄數：0 筆</span>
         </div>
     </div>
@@ -539,6 +586,7 @@
         renderMatrixTable();
         renderEmployeeList();
         renderPermissionTable();
+        renderSalaryTable();
     }
 
     function initYearMonthSelectors() {
@@ -573,20 +621,28 @@
             if (i === index) c.classList.add('active');
             else c.classList.remove('active');
         });
+        if (index === 3) renderSalaryTable();
     }
 
     function getStorageKey(year, month) {
         return `ego_v5_schedule_${year}_${month}`;
     }
 
+    // 渲染排班大表 (支援部門篩選)
     function renderMatrixTable() {
         const year = parseInt(document.getElementById('year-select').value);
         const month = parseInt(document.getElementById('month-select').value);
+        const deptFilter = document.getElementById('dept-filter').value;
         const table = document.getElementById('schedule-table');
         table.innerHTML = '';
 
         const totalDays = new Date(year, month + 1, 0).getDate();
-        const employees = getEmployees();
+        let employees = getEmployees();
+
+        if (deptFilter !== 'ALL') {
+            employees = employees.filter(e => e.dept === deptFilter);
+        }
+
         const dataKey = getStorageKey(year, month);
         let monthData = JSON.parse(localStorage.getItem(dataKey)) || {};
 
@@ -671,6 +727,103 @@
         });
     }
 
+    // ⚡ 一鍵自動輪班引擎
+    function autoGenerateSchedule() {
+        const year = parseInt(document.getElementById('year-select').value);
+        const month = parseInt(document.getElementById('month-select').value);
+        const totalDays = new Date(year, month + 1, 0).getDate();
+        const employees = getEmployees();
+        const dataKey = getStorageKey(year, month);
+        let monthData = JSON.parse(localStorage.getItem(dataKey)) || {};
+
+        const shiftKeys = ['early', 'mid', 'night', 'off'];
+
+        employees.forEach((emp, empIdx) => {
+            let empKey = `${emp.id} ${emp.name}`;
+            if (!monthData[empKey]) monthData[empKey] = {};
+
+            for (let day = 1; day <= totalDays; day++) {
+                // 簡單輪班演算法：依據員工索引與日期錯開分配班別
+                let shiftIdx = (empIdx + day) % shiftKeys.length;
+                monthData[empKey][day] = shiftKeys[shiftIdx];
+            }
+        });
+
+        localStorage.setItem(dataKey, JSON.stringify(monthData));
+        renderMatrixTable();
+        alert('⚡ 自動輪班排班完畢！');
+    }
+
+    // 📅 套用週休二日範本
+    function applyWeekendOff() {
+        const year = parseInt(document.getElementById('year-select').value);
+        const month = parseInt(document.getElementById('month-select').value);
+        const totalDays = new Date(year, month + 1, 0).getDate();
+        const employees = getEmployees();
+        const dataKey = getStorageKey(year, month);
+        let monthData = JSON.parse(localStorage.getItem(dataKey)) || {};
+
+        employees.forEach(emp => {
+            let empKey = `${emp.id} ${emp.name}`;
+            if (!monthData[empKey]) monthData[empKey] = {};
+
+            for (let day = 1; day <= totalDays; day++) {
+                let weekDay = new Date(year, month, day).getDay();
+                if (weekDay === 0 || weekDay === 6) {
+                    monthData[empKey][day] = 'off'; // 六日設為休
+                } else if (!monthData[empKey][day]) {
+                    monthData[empKey][day] = 'early'; // 平日預設早班
+                }
+            }
+        });
+
+        localStorage.setItem(dataKey, JSON.stringify(monthData));
+        renderMatrixTable();
+        alert('📅 週休二日範本套用完畢！');
+    }
+
+    // 渲染薪資與津貼結算表
+    function renderSalaryTable() {
+        const year = parseInt(document.getElementById('year-select').value);
+        const month = parseInt(document.getElementById('month-select').value);
+        const totalDays = new Date(year, month + 1, 0).getDate();
+        const employees = getEmployees();
+        const dataKey = getStorageKey(year, month);
+        let monthData = JSON.parse(localStorage.getItem(dataKey)) || {};
+
+        const pEarly = parseFloat(document.getElementById('pay-early').value) || 0;
+        const pMid = parseFloat(document.getElementById('pay-mid').value) || 0;
+        const pNight = parseFloat(document.getElementById('pay-night').value) || 0;
+
+        const tbody = document.getElementById('salary-tbody');
+        tbody.innerHTML = '';
+
+        employees.forEach(emp => {
+            let empKey = `${emp.id} ${emp.name}`;
+            let empSchedule = monthData[empKey] || {};
+            let counts = { early: 0, mid: 0, night: 0, off: 0 };
+
+            for (let day = 1; day <= totalDays; day++) {
+                let s = empSchedule[day];
+                if (counts[s] !== undefined) counts[s]++;
+            }
+
+            let totalAllowance = (counts.early * pEarly) + (counts.mid * pMid) + (counts.night * pNight);
+
+            let tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td class="emp-col" style="position:static;">${empKey}</td>
+                <td>${counts.early}</td>
+                <td>${counts.mid}</td>
+                <td>${counts.night}</td>
+                <td>${counts.off}</td>
+                <td style="font-weight:bold; color:darkgreen;">$${totalAllowance.toLocaleString()}</td>
+            `;
+            tbody.appendChild(tr);
+        });
+    }
+
+    // 員工管理與其他基礎功能
     function renderEmployeeList() {
         const table = document.getElementById('emp-list-table');
         table.innerHTML = `
@@ -735,7 +888,6 @@
         }
 
         let emps = getEmployees();
-
         if (editIndex === -1) {
             emps.push({ id, name, en, dept, title });
             alert('新員工新增成功！');
@@ -869,7 +1021,7 @@
         
         const link = document.createElement('a');
         link.setAttribute('href', url);
-        link.setAttribute('download', `eGo_ERP_排班報表_${year}年${month + 1}月.csv`);
+        link.setAttribute('download', `eGo_ERP_排班與薪資報表_${year}年${month + 1}月.csv`);
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
