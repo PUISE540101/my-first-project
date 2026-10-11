@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>鼎新 e-Go ERP 5.0 - 人事排班與權限管理系統</title>
+    <style>
+        :root {
+            --win-bg: #d4d0c8;            /* 經典 Windows 灰 */
+            --win-border-light: #ffffff;
+            --win-border-dark: #808080;
+            --win-border-darker: #404040;
+            --header-green: #005a5b;      /* 鼎新經典綠色標題列 */
+            --header-text: #ffffff;
+            --input-bg: #ffffff;
+            
+            /* 班別色彩 */
+            --shift-early: #c6e2ff;
+            --shift-mid: #fff6c4;
+            --shift-night: #ffe0b2;
+            --shift-off: #e8e8e8;
+        }
+
+        * {
+            box-sizing: border-box;
+            font-family: "PMingLiU", "新細明體", "Microsoft JhengHei", sans-serif;
+            font-size: 12px;
+        }
+
+        body {
+            background-color: #3a6ea5;   /* 經典桌布藍 */
+            margin: 0;
+            padding: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+        }
+
+        /* 視窗外框 */
+        .window {
+            background-color: var(--win-bg);
+            border: 2px solid;
+            border-color: var(--win-border-light) var(--win-border-darker) var(--win-border-darker) var(--win-border-light);
+            box-shadow: 2px 2px 5px rgba(0,0,0,0.3);
+            width: 100%;
+            max-width: 960px;
+            padding: 3px;
+        }
+
+        /* 視窗標題列 */
+        .window-header {
+            background-color: var(--header-green);
+            color: var(--header-text);
+            padding: 3px 6px;
+            font-weight: bold;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            letter-spacing: 1px;
+        }
+
+        .window-controls {
+            display: flex;
+            gap: 2px;
+        }
+
+        .win-btn {
+            width: 16px;
+            height: 14px;
+            background: var(--win-bg);
+            border: 1px solid;
+            border-color: var(--win-border-light) var(--win-border-dark) var(--win-border-dark) var(--win-border-light);
+            font-size: 9px;
+            line-height: 12px;
+            text-align: center;
+            cursor: pointer;
+            font-weight: bold;
+            color: #000;
+        }
+
+        /* ERP 功能工具列 */
+        .toolbar {
+            background-color: var(--win-bg);
+            display: flex;
+            gap: 2px;
+            padding: 4px 2px;
+            border-bottom: 1px solid var(--win-border-dark);
+            margin-bottom: 4px;
+        }
+
+        .tool-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 46px;
+            height: 40px;
+            background: var(--win-bg);
+            border: 1px solid;
+            border-color: var(--win-border-light) var(--win-border-dark) var(--win-border-dark) var(--win-border-light);
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .tool-item:active {
+            border-color: var(--win-border-dark) var(--win-border-light) var(--win-border-light) var(--win-border-dark);
+        }
+
+        .tool-icon {
+            font-size: 14px;
+            margin-bottom: 2px;
+        }
+
+        /* 頁籤 Tab */
+        .tabs {
+            display: flex;
+            gap: 2px;
+            margin-top: 4px;
+            border-bottom: 1px solid var(--win-border-dark);
+            padding-left: 4px;
+        }
+
+        .tab {
+            padding: 4px 10px;
+            background: var(--win-bg);
+            border: 1px solid;
+            border-color: var(--win-border-light) var(--win-border-dark) var(--win-bg) var(--win-border-light);
+            cursor: pointer;
+            margin-bottom: -1px;
+            font-weight: bold;
+        }
+
+        .tab.active {
+            background: var(--win-bg);
+            border-bottom: 1px solid var(--win-bg);
+            z-index: 2;
+        }
+
+        /* 主工作區域 */
+        .main-content {
+            padding: 8px;
+            border: 1px solid;
+            border-color: var(--win-border-dark) var(--win-border-light) var(--win-border-light) var(--win-border-dark);
+        }
+
+        /* 基本資料 GroupBox */
+        .group-box {
+            border: 1px solid var(--win-border-dark);
+            padding: 8px;
+            margin-bottom: 8px;
+            position: relative;
+        }
+
+        .group-title {
+            position: absolute;
+            top: -8px;
+            left: 10px;
+            background: var(--win-bg);
+            padding: 0 4px;
+            font-weight: bold;
+            color: #000080;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 6px 12px;
+            margin-top: 4px;
+        }
+
+        .form-row {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .form-row label {
+            width: 70px;
+            text-align: right;
+            color: #000;
+        }
+
+        input[type="text"], select {
+            border: 1px solid;
+            border-color: var(--win-border-dark) var(--win-border-light) var(--win-border-light) var(--win-border-dark);
+            background: var(--input-bg);
+            padding: 2px 4px;
+            height: 22px;
+            flex: 1;
+        }
+
+        /* 表格區塊 */
+        .table-container {
+            width: 100%;
+            overflow-x: auto;
+            border: 1px solid;
+            border-color: var(--win-border-dark) var(--win-border-light) var(--win-border-light) var(--win-border-dark);
+            background: #fff;
+            max-height: 400px;
+        }
+
+        .erp-table {
+            width: 100%;
+            border-collapse: collapse;
+            white-space: nowrap;
+            text-align: center;
+        }
+
+        .erp-table th, .erp-table td {
+            border: 1px solid #c0c0c0;
+            padding: 4px;
+            height: 24px;
+        }
+
+        .erp-table th {
+            background: #e0e0e0;
+            color: #000;
+            font-weight: bold;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .erp-table th.emp-col, .erp-table td.emp-col {
+            position: sticky;
+            left: 0;
+            background: #f0f0f0;
+            z-index: 11;
+            font-weight: bold;
+            text-align: left;
+            padding-left: 6px;
+            width: 100px;
+        }
+
+        .erp-table th.emp-col {
+            z-index: 20;
+            background: #d0d0d0;
+        }
+
+        /* 排班點擊格子 */
+        .shift-cell {
+            cursor: pointer;
+            user-select: none;
+            font-weight: bold;
+        }
+
+        .shift-cell:hover {
+            outline: 1px solid #000;
+        }
+
+        .shift-cell[data-shift="early"] { background-color: var(--shift-early); color: #000080; }
+        .shift-cell[data-shift="mid"] { background-color: var(--shift-mid); color: #804000; }
+        .shift-cell[data-shift="night"] { background-color: var(--shift-night); color: #800000; }
+        .shift-cell[data-shift="off"] { background-color: var(--shift-off); color: #606060; }
+
+        /* 狀態列 */
+        .statusbar {
+            margin-top: 4px;
+            padding: 2px 6px;
+            border: 1px solid;
+            border-color: var(--win-border-dark) var(--win-border-light) var(--win-border-light) var(--win-border-dark);
+            background: var(--win-bg);
+            color: #333;
+            display: flex;
+            justify-content: space-between;
+        }
+    </style>
+</head>
+<body>
+
+<div class="window">
+    <!-- 視窗標題列 -->
+    <div class="window-header">
+        <span>鼎新 e-Go ERP 5.0 - [使用者排班與考勤權限設定]</span>
+        <div class="window-controls">
+            <div class="win-btn">_</div>
+            <div class="win-btn">□</div>
+            <div class="win-btn" onclick="alert('離開系統')">✕</div>
+        </div>
+    </div>
+
+    <!-- ERP 功能工具列 -->
+    <div class="toolbar">
+        <div class="tool-item" onclick="addEmployee()">
+            <span class="tool-icon" style="color: green;">✚</span>
+            <span>新增</span>
+        </div>
+        <div class="tool-item" onclick="alert('已進入修改模式')">
+            <span class="tool-icon" style="color: blue;">✏</span>
+            <span>修改</span>
+        </div>
+        <div class="tool-item" onclick="deleteSelectedEmployee()">
+            <span class="tool-icon" style="color: red;">✖</span>
+            <span>刪除</span>
+        </div>
+        <div class="tool-item" onclick="saveData()">
+            <span class="tool-icon" style="color: darkgreen;">💾</span>
+            <span>存檔</span>
+        </div>
+        <div class="tool-item" onclick="initApp()">
+            <span class="tool-icon" style="color: darkred;">↩</span>
+            <span>放棄</span>
+        </div>
+        <div class="tool-item" onclick="exportToCSV()">
+            <span class="tool-icon" style="color: darkblue;">📊</span>
+            <span>匯出</span>
+        </div>
+        <div class="tool-item" onclick="alert('已退出作業')">
+            <span class="tool-icon">🚪</span>
+            <span>離開</span>
+        </div>
+    </div>
+
+    <!-- 頁籤 -->
+    <div class="tabs">
+        <div class="tab active">基本資料排班</div>
+        <div class="tab" onclick="alert('切換至模組權限頁面')">模組權限設定</div>
+    </div>
+
+    <!-- 主工作區 -->
+    <div class="main-content">
+        <!-- 上方基本資料區 -->
+        <div class="group-box">
+            <div class="group-title">基本資料 / 查詢條件</div>
+            <div class="form-grid">
+                <div class="form-row">
+                    <label>排班年份：</label>
+                    <select id="year-select" onchange="renderMatrixTable()"></select>
+                </div>
+                <div class="form-row">
+                    <label>排班月份：</label>
+                    <select id="month-select" onchange="renderMatrixTable()"></select>
+                </div>
+                <div class="form-row">
+                    <label>新增員工：</label>
+                    <input type="text" id="new-emp-name" placeholder="請輸入姓名...">
+                </div>
+                <div class="form-row">
+                    <button style="height: 22px; padding: 0 8px; cursor: pointer;" onclick="addEmployee()">新增至名單</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 圖例 -->
+        <div style="margin-bottom: 6px; color: #000080; font-weight: bold;">
+            操作說明：直接點擊下方對應日期的儲存格即可循環切換班別（ [空白] ➔ 早班 ➔ 中班 ➔ 晚班 ➔ 休假 ）
+        </div>
+
+        <!-- 下方矩陣排班大表 -->
+        <div class="table-container">
+            <table class="erp-table" id="schedule-table">
+                <!-- 動態產生 -->
+            </table>
+        </div>
+    </div>
+
+    <!-- 底部狀態列 -->
+    <div class="statusbar">
+        <span>系統狀態：正常 | 模式：瀏覽/排班</span>
+        <span id="record-count">總筆數：0 筆</span>
+    </div>
+</div>
+
+<script>
+    let currentDate = new Date();
+
+    // 取得員工名單
+    function getEmployees() {
+        const data = localStorage.getItem('ego_employees');
+        return data ? JSON.parse(data) : ['P001 王小明', 'P002 李小華', 'P003 張大山', 'P004 陳美麗'];
+    }
+
+    function saveEmployees(emps) {
+        localStorage.setItem('ego_employees', JSON.stringify(emps));
+        renderMatrixTable();
+    }
+
+    const shifts = [
+        { key: '', label: '' },
+        { key: 'early', label: '早' },
+        { key: 'mid', label: '中' },
+        { key: 'night', label: '晚' },
+        { key: 'off', label: '休' }
+    ];
+
+    function initApp() {
+        // 初始化年份下拉選單
+        const yearSelect = document.getElementById('year-select');
+        yearSelect.innerHTML = '';
+        const currentYear = currentDate.getFullYear();
+        for (let y = currentYear - 2; y <= currentYear + 2; y++) {
+            let opt = document.createElement('option');
+            opt.value = y;
+            opt.textContent = `${y} 年`;
+            if (y === currentYear) opt.selected = true;
+            yearSelect.appendChild(opt);
+        }
+
+        // 初始化月份下拉選單
+        const monthSelect = document.getElementById('month-select');
+        monthSelect.innerHTML = '';
+        for (let m = 0; m < 12; m++) {
+            let opt = document.createElement('option');
+            opt.value = m;
+            opt.textContent = `${m + 1} 月`;
+            if (m === currentDate.getMonth()) opt.selected = true;
+            monthSelect.appendChild(opt);
+        }
+
+        renderMatrixTable();
+    }
+
+    function getStorageKey(year, month) {
+        return `ego_schedule_${year}_${month}`;
+    }
+
+    function getMonthData(year, month) {
+        const data = localStorage.getItem(getStorageKey(year, month));
+        return data ? JSON.parse(data) : {};
+    }
+
+    function saveMonthData(year, month, data) {
+        localStorage.setItem(getStorageKey(year, month), JSON.stringify(data));
+    }
+
+    function renderMatrixTable() {
+        const year = parseInt(document.getElementById('year-select').value) || currentDate.getFullYear();
+        const month = parseInt(document.getElementById('month-select').value) || currentDate.getMonth();
+
+        const table = document.getElementById('schedule-table');
+        table.innerHTML = '';
+
+        const totalDays = new Date(year, month + 1, 0).getDate();
+        const employees = getEmployees();
+        const monthData = getMonthData(year, month);
+
+        document.getElementById('record-count').textContent = `總筆數：${employees.length} 筆`;
+
+        // 建立表頭
+        let headerTr = document.createElement('tr');
+        let thEmp = document.createElement('th');
+        thEmp.className = 'emp-col';
+        thEmp.textContent = '使用者 / 日期';
+        headerTr.appendChild(thEmp);
+
+        for (let day = 1; day <= totalDays; day++) {
+            let th = document.createElement('th');
+            let weekDay = new Date(year, month, day).getDay();
+            let weekChars = ['日', '一', '二', '三', '四', '五', '六'];
+            th.innerHTML = `${day}<br><span style="font-size:10px; font-weight:normal;">${weekChars[weekDay]}</span>`;
+            if (weekDay === 0 || weekDay === 6) {
+                th.style.color = 'red';
+            }
+            headerTr.appendChild(th);
+        }
+
+        ['早', '中', '晚', '休'].forEach(s => {
+            let th = document.createElement('th');
+            th.textContent = s;
+            headerTr.appendChild(th);
+        });
+        table.appendChild(headerTr);
+
+        // 填入員工排班資料
+        employees.forEach(emp => {
+            if (!monthData[emp]) monthData[emp] = {};
+
+            let tr = document.createElement('tr');
+            let tdEmp = document.createElement('td');
+            tdEmp.className = 'emp-col';
+            tdEmp.textContent = emp;
+            tr.appendChild(tdEmp);
+
+            let counts = { early: 0, mid: 0, night: 0, off: 0 };
+
+            for (let day = 1; day <= totalDays; day++) {
+                let td = document.createElement('td');
+                td.className = 'shift-cell';
+                
+                let currentKey = monthData[emp][day] || '';
+                if (currentKey && counts[currentKey] !== undefined) {
+                    counts[currentKey]++;
+                }
+                
+                let shiftObj = shifts.find(s => s.key === currentKey);
+                td.textContent = shiftObj ? shiftObj.label : '';
+                if (currentKey) td.setAttribute('data-shift', currentKey);
+
+                td.addEventListener('click', () => {
+                    let curKey = monthData[emp][day] || '';
+                    let curIdx = shifts.findIndex(s => s.key === curKey);
+                    let nextIdx = (curIdx + 1) % shifts.length;
+                    let nextShift = shifts[nextIdx];
+
+                    if (nextShift.key === '') {
+                        delete monthData[emp][day];
+                        td.removeAttribute('data-shift');
+                    } else {
+                        monthData[emp][day] = nextShift.key;
+                        td.setAttribute('data-shift', nextShift.key);
+                    }
+
+                    td.textContent = nextShift.label;
+                    saveMonthData(year, month, monthData);
+                    renderMatrixTable();
+                });
+
+                tr.appendChild(td);
+            }
+
+            ['early', 'mid', 'night', 'off'].forEach(key => {
+                let tdStat = document.createElement('td');
+                tdStat.textContent = counts[key];
+                tdStat.style.fontWeight = 'bold';
+                tdStat.style.backgroundColor = '#f8f8f8';
+                tr.appendChild(tdStat);
+            });
+
+            table.appendChild(tr);
+        });
+    }
+
+    function addEmployee() {
+        const input = document.getElementById('new-emp-name');
+        const name = input.value.trim();
+        if (!name) return;
+
+        let emps = getEmployees();
+        if (emps.includes(name)) {
+            alert('使用者已存在！');
+            return;
+        }
+
+        emps.push(name);
+        saveEmployees(emps);
+        input.value = '';
+    }
+
+    function deleteSelectedEmployee() {
+        let name = prompt("請輸入要刪除的使用者名稱：");
+        if (!name) return;
+
+        let emps = getEmployees();
+        if (!emps.includes(name)) {
+            alert("找不到該使用者！");
+            return;
+        }
+
+        emps = emps.filter(e => e !== name);
+        saveEmployees(emps);
+    }
+
+    function saveData() {
+        alert("資料已成功寫入資料庫！");
+    }
+
+    function exportToCSV() {
+        const year = parseInt(document.getElementById('year-select').value);
+        const month = parseInt(document.getElementById('month-select').value);
+        const totalDays = new Date(year, month + 1, 0).getDate();
+        const employees = getEmployees();
+        const monthData = getMonthData(year, month);
+
+        let csvRows = [];
+
+        let header = ['使用者代號與姓名'];
+        for (let day = 1; day <= totalDays; day++) {
+            header.push(`${day}日`);
+        }
+        header.push('總早班', '總中班', '總晚班', '總休假');
+        csvRows.push(header.join(','));
+
+        employees.forEach(emp => {
+            let row = [ `"${emp}"` ];
+            let counts = { early: 0, mid: 0, night: 0, off: 0 };
+
+            for (let day = 1; day <= totalDays; day++) {
+                let key = monthData[emp] && monthData[emp][day] ? monthData[emp][day] : '';
+                let label = '';
+                if (key === 'early') { label = '早'; counts.early++; }
+                else if (key === 'mid') { label = '中'; counts.mid++; }
+                else if (key === 'night') { label = '晚'; counts.night++; }
+                else if (key === 'off') { label = '休'; counts.off++; }
+                row.push(`"${label}"`);
+            }
+
+            row.push(counts.early, counts.mid, counts.night, counts.off);
+            csvRows.push(row.join(','));
+        });
+
+        const csvString = '\uFEFF' + csvRows.join('\n');
+        const blob = new Blob([csvString], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        
+        const link = document.createElement('a');
+        link.setAttribute('href', url);
+        link.setAttribute('download', `eGo_ERP_排班表_${year}年${month + 1}月.csv`);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
+
+    initApp();
+</script>
+
+</body>
+</html>
