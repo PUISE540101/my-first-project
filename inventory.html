@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>黑創 e-GO 進銷存管理系統 - 辦公室專業版</title>
+  <style>
+    :root {
+      --primary: #2c3e50;
+      --secondary: #34495e;
+      --accent: #27ae60;
+      --bg: #ecf0f1;
+      --card-bg: #ffffff;
+      --text: #2c3e50;
+      --border: #bdc3c7;
+      --hover-bg: #e8f8f5;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: "Microsoft JhengHei", sans-serif; }
+    body { background-color: var(--bg); color: var(--text); display: flex; height: 100vh; overflow: hidden; }
+
+    /* 左側側邊欄 Sidebar */
+    aside {
+      width: 260px;
+      background: #1a252f;
+      color: white;
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 0;
+      box-shadow: 2px 0 8px rgba(0,0,0,0.15);
+    }
+
+    .brand {
+      padding: 18px 15px;
+      background: #111a24;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+      text-align: center;
+    }
+    .brand h2 { font-size: 1.1rem; color: #fff; }
+    .brand p { font-size: 0.75rem; color: #7f8c8d; margin-top: 4px; }
+
+    .nav-menu { flex: 1; overflow-y: auto; padding: 10px 0; }
+    .nav-section { font-size: 0.75rem; color: #7f8c8d; padding: 10px 20px 4px; font-weight: bold; }
+    
+    .nav-item {
+      display: flex;
+      align-items: center;
+      padding: 10px 20px;
+      color: #bdc3c7;
+      font-size: 0.88rem;
+      cursor: pointer;
+      border-left: 4px solid transparent;
+      transition: all 0.2s;
+    }
+    .nav-item:hover { background: rgba(255,255,255,0.05); color: #fff; }
+    .nav-item.active {
+      background: var(--accent);
+      color: #fff;
+      border-left-color: #2ecc71;
+      font-weight: bold;
+    }
+
+    /* 右側主工作區 */
+    main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+
+    header {
+      height: 55px;
+      background: white;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 25px;
+    }
+    header h1 { font-size: 1.1rem; color: var(--primary); }
+    .user-info { font-size: 0.85rem; color: #7f8c8d; }
+
+    .content-body { flex: 1; padding: 20px; overflow-y: auto; }
+
+    .tab-content { display: none; }
+    .tab-content.active { display: block; animation: fadeIn 0.2s ease; }
+
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+    /* 卡片與 Grid 表單 */
+    .card {
+      background: var(--card-bg);
+      border-radius: 6px;
+      padding: 20px;
+      margin-bottom: 20px;
+      border: 1px solid var(--border);
+    }
+    .card-title {
+      font-size: 1rem;
+      color: var(--primary);
+      font-weight: bold;
+      padding-bottom: 10px;
+      margin-bottom: 15px;
+      border-bottom: 2px solid #f2f4f4;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 15px 20px;
+    }
+
+    .form-group { display: flex; flex-direction: column; }
+    .form-group label { font-size: 0.85rem; font-weight: 600; color: #444; margin-bottom: 5px; }
+    .form-group input, .form-group select, .form-group textarea {
+      padding: 8px 12px;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      font-size: 0.9rem;
+    }
+
+    .btn-group { margin-top: 15px; display: flex; gap: 10px; justify-content: flex-end; }
+    .btn {
+      padding: 8px 18px;
+      background: var(--accent);
+      color: white;
+      border: none;
+      border-radius: 4px;
+      font-size: 0.9rem;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    .btn:hover { opacity: 0.9; }
+
+    /* 報表清單 */
+    .report-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 12px;
+    }
+    .report-card {
+      background: #f8f9f9;
+      border: 1px solid var(--border);
+      padding: 12px 15px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 0.88rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .report-card:hover { border-color: var(--accent); background: white; }
+  </style>
+</head>
+<body>
+
+  <!-- 左側導覽列 -->
+  <aside>
+    <div class="brand">
+      <h2>E-GO 進銷存管理</h2>
+      <p>鈞陽系統整合 ‧ 辦公室版</p>
+    </div>
+    <div class="nav-menu">
+      <div class="nav-section">銷貨與退回管理</div>
+      <div class="nav-item active" onclick="switchTab('sales', this)">銷貨單作業</div>
+      <div class="nav-item" onclick="switchTab('salesReturn', this)">銷貨退回單</div>
+
+      <div class="nav-section">借出入管理</div>
+      <div class="nav-item" onclick="switchTab('lend', this)">借出單 / 借出還回單</div>
+      <div class="nav-item" onclick="switchTab('borrow', this)">借入單 / 借入還出單</div>
+
+      <div class="nav-section">進貨與驗收作業</div>
+      <div class="nav-item" onclick="switchTab('receive', this)">收料單與驗收單</div>
+      <div class="nav-item" onclick="switchTab('reject', this)">驗退退出與進貨退出</div>
+
+      <div class="nav-section">庫存與加工管理</div>
+      <div class="nav-item" onclick="switchTab('combo', this)">商品組合與拆解單</div>
+      <div class="nav-item" onclick="switchTab('stockAdjust', this)">調整單、調撥與盤點</div>
+      <div class="nav-item" onclick="switchTab('reports', this)">進銷存報表中心</div>
+    </div>
+  </aside>
+
+  <!-- 右側主工作區 -->
+  <main>
+    <header>
+      <h1 id="pageTitle">銷貨單作業</h1>
+      <div class="user-info">使用者：業務/倉管（小黑哥） | 辦公室工作站</div>
+    </header>
+
+    <div class="content-body">
+
+      <!-- 1. 銷貨單作業 -->
+      <div id="sales" class="tab-content active">
+        <div class="card">
+          <div class="card-title">開立銷貨單</div>
+          <div class="form-grid">
+            <div class="form-group"><label>銷貨單號</label><input type="text" value="SA-2026101201" readonly></div>
+            <div class="form-group"><label>客戶編號/名稱</label><input type="text" placeholder="輸入客戶名稱"></div>
+            <div class="form-group"><label>銷貨日期</label><input type="date" value="2026-10-12"></div>
+            <div class="form-group"><label>出貨倉庫</label><select><option>總公司成品倉</option></select></div>
+          </div>
+          <div class="btn-group"><button class="btn" onclick="alert('銷貨單已建立並扣減庫存！')">儲存並扣庫存</button></div>
+        </div>
+      </div>
+
+      <!-- 2. 銷貨退回單 -->
+      <div id="salesReturn" class="tab-content">
+        <div class="card">
+          <div class="card-title">銷貨退回單作業</div>
+          <div class="form-grid">
+            <div class="form-group"><label>退回單號</label><input type="text" value="SR-2026101201" readonly></div>
+            <div class="form-group"><label>原銷貨單號</label><input type="text" value="SA-2026101201"></div>
+            <div class="form-group"><label>退回原因</label><input type="text" placeholder="例如: 規格不符退回"></div>
+          </div>
+          <div class="btn-group"><button class="btn" onclick="alert('銷貨退回單已建立，庫存已加回！')">確認退回入庫</button></div>
+        </div>
+      </div>
+
+      <!-- 3. 借出入管理 -->
+      <div id="lend" class="tab-content">
+        <div class="card">
+          <div class="card-title">商品借出與還回管理</div>
+          <div class="form-grid">
+            <div class="form-group"><label>作業類型</label><select><option>商品借出單</option><option>借出還回單</option></select></div>
+            <div class="form-group"><label>單據編號</label><input type="text" value="LD-2026101201" readonly></div>
+            <div class="form-group"><label>對象 / 借用單位</label><input type="text" placeholder="輸入借用單位"></div>
+          </div>
+          <div class="btn-group"><button class="btn" onclick="alert('借出單據已儲存！')">儲存借出單</button></div>
+        </div>
+      </div>
+
+      <!-- 4. 借入管理 -->
+      <div id="borrow" class="tab-content">
+        <div class="card">
+          <div class="card-title">商品借入與還出管理</div>
+          <div class="form-grid">
+            <div class="form-group"><label>作業類型</label><select><option>商品借入單</option><option>借入還出單</option></select></div>
+            <div class="form-group"><label>單據編號</label><input type="text" value="BI-2026101201" readonly></div>
+            <div class="form-group"><label>出借廠商</label><input type="text" placeholder="輸入廠商名稱"></div>
+          </div>
+          <div class="btn-group"><button class="btn" onclick="alert('借入單據已儲存！')">儲存借入單</button></div>
+        </div>
+      </div>
+
+      <!-- 5. 收料與驗收 -->
+      <div id="receive" class="tab-content">
+        <div class="card">
+          <div class="card-title">採購收料與驗收作業</div>
+          <div class="form-grid">
+            <div class="form-group"><label>單據類型</label><select><option>收料單</option><option>驗收(退)單</option></select></div>
+            <div class="form-group"><label>單號</label><input type="text" value="RC-2026101201" readonly></div>
+            <div class="form-group"><label>供應廠商</label><input type="text" placeholder="輸入供應商"></div>
+          </div>
+          <div class="btn-group"><button class="btn" onclick="alert('收料與驗收資料已記錄！')">確認驗收</button></div>
+        </div>
+      </div>
+
+      <!-- 6. 驗退與進貨退出 -->
+      <div id="reject" class="tab-content">
+        <div class="card">
+          <div class="card-title">驗退退出與進貨退出作業</div>
+          <div class="form-grid">
+            <div class="form-group"><label>作業單別</label><select><option>驗退退出單</option><option>進貨退出單</option></select></div>
+            <div class="form-group"><label>單號</label><input type="text" value="RJ-2026101201" readonly></div>
+            <div class="form-group"><label>處理數量</label><input type="number" value="10"></div>
+          </div>
+          <div class="btn-group"><button class="btn" onclick="alert('退出單已建立！')">確認退出</button></div>
+        </div>
+      </div>
+
+      <!-- 7. 商品組合與拆解 -->
+      <div id="combo" class="tab-content">
+        <div class="card">
+          <div class="card-title">商品組合單與商品拆解單</div>
+          <div class="form-grid">
+            <div class="form-group"><label>作業選擇</label><select><option>商品組合單 (多合一)</option><option>商品拆解單 (一拆多)</option></select></div>
+            <div class="form-group"><label>組合/拆解數量</label><input type="number" value="1"></div>
+          </div>
+          <div class="btn-group"><button class="btn" onclick="alert('組合/拆解作業已完成，庫存已自動調整！')">執行組合與調整</button></div>
+        </div>
+      </div>
+
+      <!-- 8. 調整、調撥、盤點 -->
+      <div id="stockAdjust" class="tab-content">
+        <div class="card">
+          <div class="card-title">庫存調整、調撥與盤點精靈</div>
+          <div class="form-grid">
+            <div class="form-group"><label>功能選擇</label><select><option>庫存調整單</option><option>倉庫調撥單</option><option>盤點精靈 (盤點差異調整)</option></select></div>
+            <div class="form-group"><label>相關倉庫</label><select><option>第一倉庫 ➔ 第二倉庫</option></select></div>
+          </div>
+          <div class="btn-group"><button class="btn" onclick="alert('庫存異動與盤點資料已更新！')">確認執行</button></div>
+        </div>
+      </div>
+
+      <!-- 9. 報表中心 -->
+      <div id="reports" class="tab-content">
+        <div class="card">
+          <div class="card-title">進銷存與庫存管理報表中心</div>
+          <div class="report-grid">
+            <div class="report-card">銷貨日報/月報統計表 📊</div>
+            <div class="report-card">銷貨退回統計明細表 📋</div>
+            <div class="report-card">商品借出入明細追蹤表 📦</div>
+            <div class="report-card">採購收料與驗收報表 🧾</div>
+            <div class="report-card">進貨退出及驗退統計表 📉</div>
+            <div class="report-card">商品組合與拆解明細表 🔄</div>
+            <div class="report-card">倉庫調撥與異動明細表 🚚</div>
+            <div class="report-card">庫存盤點盈虧差異表 📝</div>
+            <div class="report-card">即時庫存數量總表 📦</div>
+            <div class="report-card">進銷存總額分析報表 💰</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <script>
+    function switchTab(stepId, element) {
+      document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+      document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+      
+      document.getElementById(stepId).classList.add('active');
+      element.classList.add('active');
+
+      document.getElementById('pageTitle').innerText = element.innerText.trim();
+    }
+  </script>
+</body>
+</html>
