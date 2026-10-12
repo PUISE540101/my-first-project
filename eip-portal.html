@@ -6,1102 +6,417 @@
   <title>PowerEIP - 企業入口平台</title>
   <style>
     :root {
-      --primary: #1e3a5f;
-      --primary-light: #2c5282;
-      --accent: #3182ce;
-      --bg: #f7fafc;
+      --primary: #003366;
+      --primary-mid: #004080;
+      --accent: #0066b3;
+      --bg: #dce6f0;
       --card: #ffffff;
-      --text: #1a202c;
-      --secondary: #718096;
-      --border: #e2e8f0;
-      --success: #38a169;
-      --warning: #d69e2e;
-      --danger: #e53e3e;
-      --sidebar-width: 220px;
-      --sidebar-bg: #1a365d;
+      --text: #1a1a1a;
+      --secondary: #4a5568;
+      --border: #a0b4c8;
+      --border-light: #c8d4e0;
+      --header-h: 42px;
+      --sidebar-w: 190px;
     }
 
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      -webkit-tap-highlight-color: transparent;
-    }
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
 
     body {
-      font-family: "Segoe UI", "Noto Sans TC", -apple-system, BlinkMacSystemFont, Roboto, "Microsoft JhengHei", sans-serif;
+      font-family: "Microsoft JhengHei", "微軟正黑體", "PMingLiU", "新細明體", Arial, sans-serif;
       background: var(--bg);
       color: var(--text);
+      font-size: 13px;
+      line-height: 1.4;
       min-height: 100vh;
-      display: flex;
-      font-size: 14px;
-      line-height: 1.5;
     }
 
-    /* ===== Sidebar ===== */
-    .sidebar {
-      width: var(--sidebar-width);
-      background: var(--sidebar-bg);
-      color: #e2e8f0;
+    /* ===== 頂部深藍列（鼎新經典） ===== */
+    .topbar {
+      height: var(--header-h);
+      background: linear-gradient(to bottom, #0055a4 0%, #003366 100%);
+      color: #fff;
       display: flex;
-      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 12px;
       position: fixed;
-      top: 0;
-      left: 0;
-      bottom: 0;
-      z-index: 100;
-      transition: transform 0.25s ease;
+      top: 0; left: 0; right: 0;
+      z-index: 300;
+      border-bottom: 1px solid #002244;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.25);
     }
 
-    .sidebar-header {
-      padding: 22px 20px 18px;
-      border-bottom: 1px solid rgba(255,255,255,0.08);
+    .topbar-left { display: flex; align-items: center; gap: 10px; }
+    .topbar-logo { font-size: 15px; font-weight: 700; letter-spacing: 1px; }
+    .topbar-logo small { font-weight: 400; font-size: 12px; opacity: 0.9; margin-left: 6px; }
+    .topbar-right { display: flex; align-items: center; gap: 14px; font-size: 12px; }
+    .topbar-right .badge {
+      background: #e53935; color: #fff; font-size: 10px;
+      min-width: 14px; height: 14px; border-radius: 7px;
+      display: inline-flex; align-items: center; justify-content: center;
+      margin-left: 2px; font-weight: 600;
     }
 
-    .sidebar-header h1 {
-      font-size: 1.15rem;
-      font-weight: 600;
-      color: #fff;
-      letter-spacing: 0.02em;
+    .menu-btn {
+      display: none; background: none; border: none; color: #fff;
+      font-size: 18px; cursor: pointer; padding: 2px 6px;
     }
 
-    .sidebar-header p {
-      font-size: 0.7rem;
-      color: #a0aec0;
-      margin-top: 3px;
-      letter-spacing: 0.03em;
-    }
-
-    .nav-menu {
-      flex: 1;
-      padding: 16px 10px;
-      overflow-y: auto;
-    }
-
-    .nav-item {
+    /* ===== 版面 ===== */
+    .wrap {
       display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 10px 14px;
-      border-radius: 6px;
-      color: #cbd5e0;
-      font-size: 0.875rem;
-      font-weight: 500;
+      margin-top: var(--header-h);
+      min-height: calc(100vh - var(--header-h));
+    }
+
+    /* ===== 左側選單 ===== */
+    .sidebar {
+      width: var(--sidebar-w);
+      background: #eef3f8;
+      border-right: 1px solid var(--border);
+      position: fixed;
+      top: var(--header-h); left: 0; bottom: 0;
+      overflow-y: auto; z-index: 200;
+    }
+
+    .side-title {
+      background: #c5d4e4;
+      border-bottom: 1px solid var(--border);
+      padding: 6px 10px;
+      font-size: 12px; font-weight: 700; color: var(--primary);
+    }
+
+    .side-item {
+      display: block;
+      padding: 7px 12px 7px 14px;
+      color: #2d3748;
+      font-size: 13px;
+      border-bottom: 1px solid #d8e2ec;
       cursor: pointer;
-      transition: all 0.15s;
-      margin-bottom: 2px;
+      border-left: 3px solid transparent;
+    }
+    .side-item:hover { background: #d9e6f2; color: var(--primary); }
+    .side-item.active {
+      background: #c8daf0;
+      color: var(--primary);
+      font-weight: 700;
+      border-left-color: #0066b3;
     }
 
-    .nav-item:hover {
-      background: rgba(255,255,255,0.06);
-      color: #fff;
-    }
-
-    .nav-item.active {
-      background: rgba(49, 130, 206, 0.25);
-      color: #fff;
-      border-left: 3px solid #63b3ed;
-      padding-left: 11px;
-    }
-
-    .nav-item .icon {
-      width: 18px;
-      text-align: center;
-      font-size: 0.95rem;
-      opacity: 0.9;
-    }
-
-    .sidebar-footer {
-      padding: 14px 16px;
-      border-top: 1px solid rgba(255,255,255,0.08);
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-
-    .avatar {
-      width: 34px;
-      height: 34px;
-      border-radius: 50%;
-      background: #2b6cb0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: 600;
-      font-size: 0.85rem;
-      color: #fff;
-    }
-
-    .user-info {
-      flex: 1;
-      overflow: hidden;
-    }
-
-    .user-info .name {
-      font-size: 0.82rem;
-      font-weight: 600;
-      color: #edf2f7;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    .user-info .role {
-      font-size: 0.7rem;
-      color: #a0aec0;
-    }
-
-    /* ===== Main Content ===== */
+    /* ===== 主內容 ===== */
     .main {
       flex: 1;
-      margin-left: var(--sidebar-width);
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
+      margin-left: var(--sidebar-w);
+      padding: 10px 12px 16px;
     }
 
-    .topbar {
-      background: var(--card);
-      padding: 0 24px;
-      height: 52px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      border-bottom: 1px solid var(--border);
-      position: sticky;
-      top: 0;
-      z-index: 50;
+    .crumb {
+      font-size: 12px; color: var(--secondary);
+      margin-bottom: 8px;
     }
+    .crumb b { color: var(--primary); }
 
-    .topbar-left {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-
-    .menu-toggle {
-      display: none;
-      background: none;
-      border: none;
-      font-size: 1.25rem;
-      cursor: pointer;
-      padding: 4px 8px;
-      color: var(--text);
-    }
-
-    .page-title {
-      font-size: 1rem;
-      font-weight: 600;
-      color: var(--text);
-    }
-
-    .topbar-right {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .notif-btn {
-      position: relative;
-      background: none;
-      border: none;
-      font-size: 1.1rem;
-      cursor: pointer;
-      padding: 6px 8px;
-      border-radius: 6px;
-      color: var(--secondary);
-    }
-
-    .notif-btn:hover {
-      background: #edf2f7;
-    }
-
-    .notif-btn .badge {
-      position: absolute;
-      top: 2px;
-      right: 2px;
-      background: var(--danger);
-      color: white;
-      font-size: 0.6rem;
-      min-width: 15px;
-      height: 15px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: 600;
-    }
-
-    .content {
-      padding: 20px 24px;
-      flex: 1;
-    }
-
-    /* ===== Stats ===== */
-    .stats-row {
+    /* 統計列 */
+    .stat-row {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
-      gap: 16px;
-      margin-bottom: 20px;
+      gap: 8px;
+      margin-bottom: 10px;
     }
-
-    .stat-card {
-      background: var(--card);
-      border-radius: 8px;
-      padding: 16px 18px;
+    .stat-box {
+      background: #fff;
       border: 1px solid var(--border);
+      padding: 10px 12px;
       display: flex;
       align-items: center;
-      gap: 14px;
+      gap: 10px;
     }
-
-    .stat-icon {
-      width: 40px;
-      height: 40px;
-      border-radius: 8px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.1rem;
-      color: #fff;
-      flex-shrink: 0;
+    .stat-box .num {
+      font-size: 22px; font-weight: 700; color: var(--primary);
+      line-height: 1;
     }
+    .stat-box .lbl { font-size: 12px; color: var(--secondary); }
 
-    .stat-info .label {
-      font-size: 0.75rem;
-      color: var(--secondary);
-      font-weight: 500;
-    }
-
-    .stat-info .value {
-      font-size: 1.4rem;
-      font-weight: 700;
-      color: var(--text);
-      margin-top: 1px;
-      letter-spacing: -0.02em;
-    }
-
-    /* ===== Dashboard Grid ===== */
-    .dashboard-grid {
+    /* 面板 */
+    .panel-row {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 16px;
-    }
-
-    .card {
-      background: var(--card);
-      border-radius: 8px;
-      border: 1px solid var(--border);
-      overflow: hidden;
-    }
-
-    .card-header {
-      padding: 12px 16px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      border-bottom: 1px solid var(--border);
-      background: #f8fafc;
-    }
-
-    .card-header h3 {
-      font-size: 0.875rem;
-      font-weight: 600;
-      color: var(--text);
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-
-    .card-header .more {
-      font-size: 0.75rem;
-      color: var(--accent);
-      cursor: pointer;
-      font-weight: 500;
-    }
-
-    .card-header .more:hover {
-      text-decoration: underline;
-    }
-
-    .card-body {
-      padding: 8px 16px 12px;
-    }
-
-    /* Announcements */
-    .announce-item {
-      padding: 11px 0;
-      border-bottom: 1px solid #edf2f7;
-      cursor: pointer;
-    }
-    .announce-item:last-child { border-bottom: none; }
-    .announce-item:hover .title { color: var(--accent); }
-
-    .announce-item .title {
-      font-size: 0.875rem;
-      font-weight: 500;
-      margin-bottom: 3px;
-      display: flex;
-      align-items: center;
       gap: 8px;
-      transition: color 0.15s;
+      margin-bottom: 8px;
     }
+    .panel {
+      background: #fff;
+      border: 1px solid var(--border);
+    }
+    .panel-hd {
+      background: #e4ecf5;
+      border-bottom: 1px solid var(--border);
+      padding: 6px 10px;
+      font-size: 13px; font-weight: 700; color: var(--primary);
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .panel-hd a {
+      font-size: 12px; color: var(--accent); font-weight: 400;
+      text-decoration: none; cursor: pointer;
+    }
+    .panel-hd a:hover { text-decoration: underline; }
+    .panel-bd { padding: 0; }
 
-    .announce-item .meta {
-      font-size: 0.75rem;
-      color: var(--secondary);
+    .row {
+      display: flex; align-items: center; gap: 8px;
+      padding: 6px 10px;
+      border-bottom: 1px solid var(--border-light);
+      font-size: 13px;
+      cursor: pointer;
     }
+    .row:last-child { border-bottom: none; }
+    .row:hover { background: #f0f6fc; }
+    .row .t { flex: 1; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+    .row .m { font-size: 11px; color: var(--secondary); flex-shrink: 0; }
 
     .tag {
-      font-size: 0.65rem;
-      padding: 1px 6px;
-      border-radius: 3px;
-      font-weight: 600;
-      letter-spacing: 0.02em;
+      font-size: 11px; padding: 0 4px; border: 1px solid;
+      margin-right: 4px; font-weight: 600;
     }
-    .tag-important { background: #fff5f5; color: #c53030; border: 1px solid #feb2b2; }
-    .tag-info { background: #ebf8ff; color: #2b6cb0; border: 1px solid #90cdf4; }
-    .tag-success { background: #f0fff4; color: #276749; border: 1px solid #9ae6b4; }
+    .tag-r { background: #fce4ec; color: #c62828; border-color: #ef9a9a; }
+    .tag-b { background: #e3f2fd; color: #1565c0; border-color: #90caf9; }
+    .tag-g { background: #e8f5e9; color: #2e7d32; border-color: #a5d6a7; }
 
-    /* Todos */
-    .todo-item {
-      display: flex;
-      align-items: flex-start;
-      gap: 10px;
-      padding: 11px 0;
-      border-bottom: 1px solid #edf2f7;
+    .chk {
+      width: 13px; height: 13px; border: 1px solid #78909c;
+      flex-shrink: 0; cursor: pointer;
     }
-    .todo-item:last-child { border-bottom: none; }
-
-    .todo-check {
-      width: 16px;
-      height: 16px;
-      border: 1.5px solid #a0aec0;
-      border-radius: 3px;
-      margin-top: 3px;
-      cursor: pointer;
-      flex-shrink: 0;
-      transition: all 0.15s;
-    }
-    .todo-check:hover {
-      border-color: var(--accent);
-    }
-    .todo-check.done {
-      background: var(--success);
-      border-color: var(--success);
-      position: relative;
-    }
-    .todo-check.done::after {
-      content: "✓";
-      color: white;
-      font-size: 11px;
-      position: absolute;
-      top: -1px;
-      left: 2px;
-      font-weight: 700;
+    .chk.on { background: #2e7d32; border-color: #2e7d32; position: relative; }
+    .chk.on::after {
+      content: "✓"; color: #fff; font-size: 10px;
+      position: absolute; top: -2px; left: 1px; font-weight: 700;
     }
 
-    .todo-content {
-      flex: 1;
-    }
+    .pri { font-size: 11px; padding: 0 3px; font-weight: 600; margin-right: 3px; }
+    .pri-h { background: #fce4ec; color: #c62828; }
+    .pri-m { background: #fff8e1; color: #f57f17; }
+    .pri-l { background: #e8f5e9; color: #2e7d32; }
 
-    .todo-content .title {
-      font-size: 0.875rem;
-      font-weight: 500;
+    .sys-grid {
+      display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px;
+      padding: 8px;
     }
-    .todo-content .title.done {
-      text-decoration: line-through;
-      color: var(--secondary);
+    .sys-btn {
+      border: 1px solid var(--border); background: #f7fafc;
+      text-align: center; padding: 10px 4px; cursor: pointer;
     }
+    .sys-btn:hover { background: #e3f2fd; border-color: #90caf9; }
+    .sys-btn .c { font-weight: 700; color: var(--primary); font-size: 13px; }
+    .sys-btn .n { font-size: 11px; color: var(--secondary); }
 
-    .todo-content .meta {
-      font-size: 0.75rem;
-      color: var(--secondary);
-      margin-top: 2px;
-    }
+    /* 表格頁 */
+    .page { display: none; }
+    .page.on { display: block; }
 
-    .priority {
-      font-size: 0.65rem;
-      padding: 1px 5px;
-      border-radius: 3px;
-      font-weight: 600;
+    table.grid {
+      width: 100%; border-collapse: collapse;
+      background: #fff; border: 1px solid var(--border);
     }
-    .priority-high { background: #fff5f5; color: #c53030; }
-    .priority-mid { background: #fffff0; color: #b7791f; }
-    .priority-low { background: #f0fff4; color: #276749; }
-
-    /* Calendar */
-    .cal-list .cal-item {
-      display: flex;
-      gap: 12px;
-      padding: 11px 0;
-      border-bottom: 1px solid #edf2f7;
-    }
-    .cal-list .cal-item:last-child { border-bottom: none; }
-
-    .cal-date {
-      width: 40px;
-      text-align: center;
-      flex-shrink: 0;
-      background: #edf2f7;
-      border-radius: 6px;
-      padding: 4px 0;
-    }
-    .cal-date .day {
-      font-size: 1.05rem;
-      font-weight: 700;
-      line-height: 1.2;
-      color: var(--primary);
-    }
-    .cal-date .month {
-      font-size: 0.65rem;
-      color: var(--secondary);
-    }
-
-    .cal-info .title {
-      font-size: 0.875rem;
-      font-weight: 500;
-    }
-    .cal-info .time {
-      font-size: 0.75rem;
-      color: var(--secondary);
-      margin-top: 2px;
-    }
-
-    /* Quick Links */
-    .quick-grid {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 10px;
-    }
-
-    .quick-item {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 8px;
-      padding: 14px 6px;
-      border-radius: 8px;
-      background: #f7fafc;
-      border: 1px solid transparent;
-      cursor: pointer;
-      transition: all 0.15s;
-      text-align: center;
-    }
-    .quick-item:hover {
-      background: #ebf8ff;
-      border-color: #bee3f8;
-    }
-
-    .quick-icon {
-      width: 36px;
-      height: 36px;
-      border-radius: 8px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 0.8rem;
-      color: white;
-      font-weight: 600;
-    }
-
-    .quick-item span {
-      font-size: 0.75rem;
-      font-weight: 500;
-      color: var(--text);
-    }
-
-    /* List pages */
-    .page-section {
-      display: none;
-    }
-    .page-section.active {
-      display: block;
-    }
-
-    .list-card {
-      background: var(--card);
-      border-radius: 8px;
+    table.grid th {
+      background: #d0dce8;
       border: 1px solid var(--border);
-      overflow: hidden;
+      padding: 6px 8px;
+      font-size: 12px; font-weight: 700; color: var(--primary);
+      text-align: left;
     }
+    table.grid td {
+      border: 1px solid var(--border-light);
+      padding: 6px 8px;
+      font-size: 13px;
+    }
+    table.grid tr:hover td { background: #f0f6fc; }
 
-    .list-item {
-      padding: 13px 16px;
-      border-bottom: 1px solid #edf2f7;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      cursor: pointer;
-      transition: background 0.1s;
+    /* 手機 */
+    @media (max-width: 860px) {
+      .sidebar { transform: translateX(-100%); transition: 0.2s; }
+      .sidebar.open { transform: translateX(0); }
+      .main { margin-left: 0; }
+      .panel-row { grid-template-columns: 1fr; }
+      .stat-row { grid-template-columns: 1fr 1fr; }
+      .menu-btn { display: block; }
     }
-    .list-item:last-child { border-bottom: none; }
-    .list-item:hover { background: #f7fafc; }
-
-    .list-item .icon-box {
-      width: 36px;
-      height: 36px;
-      border-radius: 6px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 0.75rem;
-      color: white;
-      flex-shrink: 0;
-      font-weight: 600;
-    }
-
-    .list-item .info {
-      flex: 1;
-      min-width: 0;
-    }
-    .list-item .info .title {
-      font-size: 0.875rem;
-      font-weight: 500;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-    .list-item .info .desc {
-      font-size: 0.75rem;
-      color: var(--secondary);
-      margin-top: 2px;
-    }
-
-    /* Mobile */
-    @media (max-width: 900px) {
-      .sidebar {
-        transform: translateX(-100%);
-      }
-      .sidebar.open {
-        transform: translateX(0);
-      }
-      .main {
-        margin-left: 0;
-      }
-      .menu-toggle {
-        display: block;
-      }
-      .dashboard-grid {
-        grid-template-columns: 1fr;
-      }
-      .stats-row {
-        grid-template-columns: 1fr 1fr;
-      }
-      .content {
-        padding: 16px;
-      }
-    }
-
     @media (max-width: 480px) {
-      .stats-row {
-        grid-template-columns: 1fr 1fr;
-        gap: 10px;
-      }
-      .stat-card {
-        padding: 12px;
-      }
-      .stat-icon {
-        width: 34px;
-        height: 34px;
-        font-size: 0.95rem;
-      }
-      .stat-info .value {
-        font-size: 1.2rem;
-      }
-      .quick-grid {
-        grid-template-columns: repeat(2, 1fr);
-      }
+      .stat-row { grid-template-columns: 1fr 1fr; gap: 6px; }
+      .sys-grid { grid-template-columns: 1fr 1fr; }
     }
 
-    .overlay {
-      display: none;
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,0.35);
-      z-index: 90;
+    .mask {
+      display: none; position: fixed; inset: 0;
+      background: rgba(0,0,0,0.3); z-index: 150;
+      top: var(--header-h);
     }
-    .overlay.show {
-      display: block;
-    }
+    .mask.on { display: block; }
   </style>
 </head>
 <body>
 
-<!-- Sidebar -->
-<aside class="sidebar" id="sidebar">
-  <div class="sidebar-header">
-    <h1>PowerEIP</h1>
-    <p>ENTERPRISE INFORMATION PORTAL</p>
+<div class="topbar">
+  <div class="topbar-left">
+    <button class="menu-btn" onclick="toggleSide()">☰</button>
+    <div class="topbar-logo">PowerEIP <small>企業入口與協作平台</small></div>
+  </div>
+  <div class="topbar-right">
+    <span>通知 <span class="badge">3</span></span>
+    <span>王小明（人資部）</span>
+  </div>
+</div>
+
+<div class="mask" id="mask" onclick="closeSide()"></div>
+
+<div class="wrap">
+  <div class="sidebar" id="side">
+    <div class="side-title">功能選單</div>
+    <div class="side-item active" data-p="home" onclick="go('home')">首頁總覽</div>
+    <div class="side-item" data-p="announce" onclick="go('announce')">公告管理</div>
+    <div class="side-item" data-p="todo" onclick="go('todo')">我的待辦</div>
+    <div class="side-item" data-p="calendar" onclick="go('calendar')">行事曆</div>
+    <div class="side-item" data-p="docs" onclick="go('docs')">文件中心</div>
+    <div class="side-item" data-p="systems" onclick="go('systems')">系統入口</div>
   </div>
 
-  <nav class="nav-menu">
-    <div class="nav-item active" data-page="home" onclick="switchPage('home')">
-      <span class="icon">▣</span> 首頁
-    </div>
-    <div class="nav-item" data-page="announce" onclick="switchPage('announce')">
-      <span class="icon">≡</span> 公告
-    </div>
-    <div class="nav-item" data-page="todo" onclick="switchPage('todo')">
-      <span class="icon">☑</span> 我的待辦
-    </div>
-    <div class="nav-item" data-page="calendar" onclick="switchPage('calendar')">
-      <span class="icon">▦</span> 行事曆
-    </div>
-    <div class="nav-item" data-page="docs" onclick="switchPage('docs')">
-      <span class="icon">▤</span> 文件中心
-    </div>
-    <div class="nav-item" data-page="systems" onclick="switchPage('systems')">
-      <span class="icon">⧉</span> 系統入口
-    </div>
-  </nav>
+  <div class="main">
 
-  <div class="sidebar-footer">
-    <div class="avatar">王</div>
-    <div class="user-info">
-      <div class="name">王小明</div>
-      <div class="role">人資部 · 專員</div>
-    </div>
-  </div>
-</aside>
+    <!-- 首頁 -->
+    <div class="page on" id="p-home">
+      <div class="crumb"><b>PowerEIP</b> 〉 首頁總覽</div>
 
-<div class="overlay" id="overlay" onclick="closeSidebar()"></div>
+      <div class="stat-row">
+        <div class="stat-box"><div><div class="num">7</div><div class="lbl">待辦事項</div></div></div>
+        <div class="stat-box"><div><div class="num">3</div><div class="lbl">未讀公告</div></div></div>
+        <div class="stat-box"><div><div class="num">2</div><div class="lbl">今日行程</div></div></div>
+        <div class="stat-box"><div><div class="num">5</div><div class="lbl">最近文件</div></div></div>
+      </div>
 
-<!-- Main -->
-<div class="main">
-  <div class="topbar">
-    <div class="topbar-left">
-      <button class="menu-toggle" onclick="toggleSidebar()">☰</button>
-      <div class="page-title" id="pageTitle">首頁</div>
-    </div>
-    <div class="topbar-right">
-      <button class="notif-btn" title="通知">
-        ●
-        <span class="badge">3</span>
-      </button>
-    </div>
-  </div>
-
-  <div class="content">
-
-    <!-- ===== 首頁 ===== -->
-    <div class="page-section active" id="page-home">
-      <div class="stats-row">
-        <div class="stat-card">
-          <div class="stat-icon" style="background:#2b6cb0">☑</div>
-          <div class="stat-info">
-            <div class="label">待辦事項</div>
-            <div class="value">7</div>
+      <div class="panel-row">
+        <div class="panel">
+          <div class="panel-hd">最新公告 <a onclick="go('announce')">更多 »</a></div>
+          <div class="panel-bd">
+            <div class="row"><div class="t"><span class="tag tag-r">重要</span>10月份全員教育訓練通知</div><div class="m">人資部 2小時前</div></div>
+            <div class="row"><div class="t"><span class="tag tag-b">通知</span>系統維護公告（10/15 凌晨）</div><div class="m">資訊部 昨天</div></div>
+            <div class="row"><div class="t"><span class="tag tag-g">活動</span>周年慶活動報名開始</div><div class="m">總經理室 3天前</div></div>
           </div>
         </div>
-        <div class="stat-card">
-          <div class="stat-icon" style="background:#c05621">≡</div>
-          <div class="stat-info">
-            <div class="label">未讀公告</div>
-            <div class="value">3</div>
-          </div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-icon" style="background:#2f855a">▦</div>
-          <div class="stat-info">
-            <div class="label">今日行程</div>
-            <div class="value">2</div>
-          </div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-icon" style="background:#6b46c1">▤</div>
-          <div class="stat-info">
-            <div class="label">最近文件</div>
-            <div class="value">5</div>
+        <div class="panel">
+          <div class="panel-hd">我的待辦 <a onclick="go('todo')">更多 »</a></div>
+          <div class="panel-bd">
+            <div class="row"><div class="chk" onclick="this.classList.toggle('on')"></div><div class="t">審核 10月請假申請（3件）</div><div class="m"><span class="pri pri-h">高</span>今天</div></div>
+            <div class="row"><div class="chk" onclick="this.classList.toggle('on')"></div><div class="t">提交部門月報</div><div class="m"><span class="pri pri-m">中</span>明天</div></div>
+            <div class="row"><div class="chk" onclick="this.classList.toggle('on')"></div><div class="t">確認新進人員報到資料</div><div class="m"><span class="pri pri-l">低</span>本週五</div></div>
           </div>
         </div>
       </div>
 
-      <div class="dashboard-grid">
-        <!-- 公告 -->
-        <div class="card">
-          <div class="card-header">
-            <h3>最新公告</h3>
-            <span class="more" onclick="switchPage('announce')">查看全部</span>
-          </div>
-          <div class="card-body">
-            <div class="announce-item">
-              <div class="title">
-                <span class="tag tag-important">重要</span>
-                10月份全員教育訓練通知
-              </div>
-              <div class="meta">人資部 · 2小時前</div>
-            </div>
-            <div class="announce-item">
-              <div class="title">
-                <span class="tag tag-info">通知</span>
-                系統維護公告（10/15 凌晨）
-              </div>
-              <div class="meta">資訊部 · 昨天</div>
-            </div>
-            <div class="announce-item">
-              <div class="title">
-                <span class="tag tag-success">活動</span>
-                周年慶活動報名開始
-              </div>
-              <div class="meta">總經理室 · 3天前</div>
-            </div>
+      <div class="panel-row">
+        <div class="panel">
+          <div class="panel-hd">近期行程 <a onclick="go('calendar')">更多 »</a></div>
+          <div class="panel-bd">
+            <div class="row"><div class="t">10/12 部門週會</div><div class="m">10:00–11:00 會議室A</div></div>
+            <div class="row"><div class="t">10/12 客戶拜訪 – 台積電</div><div class="m">14:30–16:00 外出</div></div>
+            <div class="row"><div class="t">10/15 全員教育訓練</div><div class="m">09:00–12:00 大禮堂</div></div>
           </div>
         </div>
-
-        <!-- 待辦 -->
-        <div class="card">
-          <div class="card-header">
-            <h3>我的待辦</h3>
-            <span class="more" onclick="switchPage('todo')">查看全部</span>
-          </div>
-          <div class="card-body">
-            <div class="todo-item">
-              <div class="todo-check" onclick="this.classList.toggle('done')"></div>
-              <div class="todo-content">
-                <div class="title">審核 10月請假申請（3件）</div>
-                <div class="meta">
-                  <span class="priority priority-high">高</span>
-                  截止：今天 18:00
-                </div>
-              </div>
-            </div>
-            <div class="todo-item">
-              <div class="todo-check" onclick="this.classList.toggle('done')"></div>
-              <div class="todo-content">
-                <div class="title">提交部門月報</div>
-                <div class="meta">
-                  <span class="priority priority-mid">中</span>
-                  截止：明天
-                </div>
-              </div>
-            </div>
-            <div class="todo-item">
-              <div class="todo-check" onclick="this.classList.toggle('done')"></div>
-              <div class="todo-content">
-                <div class="title">確認新進人員報到資料</div>
-                <div class="meta">
-                  <span class="priority priority-low">低</span>
-                  截止：本週五
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- 行事曆 -->
-        <div class="card">
-          <div class="card-header">
-            <h3>近期行程</h3>
-            <span class="more" onclick="switchPage('calendar')">查看全部</span>
-          </div>
-          <div class="card-body cal-list">
-            <div class="cal-item">
-              <div class="cal-date">
-                <div class="day">12</div>
-                <div class="month">10月</div>
-              </div>
-              <div class="cal-info">
-                <div class="title">部門週會</div>
-                <div class="time">10:00 – 11:00 · 會議室 A</div>
-              </div>
-            </div>
-            <div class="cal-item">
-              <div class="cal-date">
-                <div class="day">12</div>
-                <div class="month">10月</div>
-              </div>
-              <div class="cal-info">
-                <div class="title">客戶拜訪 – 台積電</div>
-                <div class="time">14:30 – 16:00 · 外出</div>
-              </div>
-            </div>
-            <div class="cal-item">
-              <div class="cal-date">
-                <div class="day">15</div>
-                <div class="month">10月</div>
-              </div>
-              <div class="cal-info">
-                <div class="title">全員教育訓練</div>
-                <div class="time">09:00 – 12:00 · 大禮堂</div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- 系統快捷入口 -->
-        <div class="card">
-          <div class="card-header">
-            <h3>常用系統</h3>
-            <span class="more" onclick="switchPage('systems')">全部系統</span>
-          </div>
-          <div class="card-body">
-            <div class="quick-grid">
-              <div class="quick-item">
-                <div class="quick-icon" style="background:#2b6cb0">HR</div>
-                <span>人資系統</span>
-              </div>
-              <div class="quick-item">
-                <div class="quick-icon" style="background:#2f855a">BPM</div>
-                <span>流程管理</span>
-              </div>
-              <div class="quick-item">
-                <div class="quick-icon" style="background:#c05621">ERP</div>
-                <span>營運管理</span>
-              </div>
-              <div class="quick-item">
-                <div class="quick-icon" style="background:#6b46c1">ISO</div>
-                <span>文件制度</span>
-              </div>
-            </div>
+        <div class="panel">
+          <div class="panel-hd">常用系統 <a onclick="go('systems')">更多 »</a></div>
+          <div class="sys-grid">
+            <div class="sys-btn"><div class="c">HRM</div><div class="n">人資系統</div></div>
+            <div class="sys-btn"><div class="c">BPM</div><div class="n">流程管理</div></div>
+            <div class="sys-btn"><div class="c">ERP</div><div class="n">營運管理</div></div>
+            <div class="sys-btn"><div class="c">ISO</div><div class="n">文件制度</div></div>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- ===== 公告頁 ===== -->
-    <div class="page-section" id="page-announce">
-      <div class="list-card">
-        <div class="list-item">
-          <div class="icon-box" style="background:#c53030">重</div>
-          <div class="info">
-            <div class="title">10月份全員教育訓練通知</div>
-            <div class="desc">人資部 · 2小時前 · 重要</div>
-          </div>
-        </div>
-        <div class="list-item">
-          <div class="icon-box" style="background:#2b6cb0">通</div>
-          <div class="info">
-            <div class="title">系統維護公告（10/15 凌晨 02:00–05:00）</div>
-            <div class="desc">資訊部 · 昨天</div>
-          </div>
-        </div>
-        <div class="list-item">
-          <div class="icon-box" style="background:#2f855a">活</div>
-          <div class="info">
-            <div class="title">周年慶活動報名開始</div>
-            <div class="desc">總經理室 · 3天前</div>
-          </div>
-        </div>
-        <div class="list-item">
-          <div class="icon-box" style="background:#b7791f">績</div>
-          <div class="info">
-            <div class="title">第四季績效考核時程公告</div>
-            <div class="desc">人資部 · 5天前</div>
-          </div>
-        </div>
-        <div class="list-item">
-          <div class="icon-box" style="background:#4a5568">辦</div>
-          <div class="info">
-            <div class="title">辦公室座位調整通知</div>
-            <div class="desc">總務部 · 1週前</div>
-          </div>
-        </div>
-      </div>
+    <!-- 公告 -->
+    <div class="page" id="p-announce">
+      <div class="crumb"><b>PowerEIP</b> 〉 公告管理</div>
+      <table class="grid">
+        <tr><th style="width:60px">類型</th><th>主旨</th><th style="width:90px">發布單位</th><th style="width:100px">發布時間</th></tr>
+        <tr><td><span class="tag tag-r">重要</span></td><td>10月份全員教育訓練通知</td><td>人資部</td><td>2小時前</td></tr>
+        <tr><td><span class="tag tag-b">通知</span></td><td>系統維護公告（10/15 凌晨 02:00–05:00）</td><td>資訊部</td><td>昨天</td></tr>
+        <tr><td><span class="tag tag-g">活動</span></td><td>周年慶活動報名開始</td><td>總經理室</td><td>3天前</td></tr>
+        <tr><td><span class="tag tag-b">通知</span></td><td>第四季績效考核時程公告</td><td>人資部</td><td>5天前</td></tr>
+        <tr><td><span class="tag tag-b">通知</span></td><td>辦公室座位調整通知</td><td>總務部</td><td>1週前</td></tr>
+      </table>
     </div>
 
-    <!-- ===== 待辦頁 ===== -->
-    <div class="page-section" id="page-todo">
-      <div class="list-card">
-        <div class="list-item">
-          <div class="todo-check" onclick="this.classList.toggle('done')"></div>
-          <div class="info">
-            <div class="title">審核 10月請假申請（3件）</div>
-            <div class="desc"><span class="priority priority-high">高</span> 截止：今天 18:00 · 來自 BPM</div>
-          </div>
-        </div>
-        <div class="list-item">
-          <div class="todo-check" onclick="this.classList.toggle('done')"></div>
-          <div class="info">
-            <div class="title">提交部門月報</div>
-            <div class="desc"><span class="priority priority-mid">中</span> 截止：明天 · 來自 主管</div>
-          </div>
-        </div>
-        <div class="list-item">
-          <div class="todo-check" onclick="this.classList.toggle('done')"></div>
-          <div class="info">
-            <div class="title">確認新進人員報到資料</div>
-            <div class="desc"><span class="priority priority-low">低</span> 截止：本週五 · 來自 HRM</div>
-          </div>
-        </div>
-        <div class="list-item">
-          <div class="todo-check" onclick="this.classList.toggle('done')"></div>
-          <div class="info">
-            <div class="title">簽署保密協議更新版</div>
-            <div class="desc"><span class="priority priority-mid">中</span> 截止：10/20 · 來自 ISO</div>
-          </div>
-        </div>
-        <div class="list-item">
-          <div class="todo-check" onclick="this.classList.toggle('done')"></div>
-          <div class="info">
-            <div class="title">填寫滿意度調查問卷</div>
-            <div class="desc"><span class="priority priority-low">低</span> 截止：10/25 · 來自 人資</div>
-          </div>
-        </div>
-      </div>
+    <!-- 待辦 -->
+    <div class="page" id="p-todo">
+      <div class="crumb"><b>PowerEIP</b> 〉 我的待辦</div>
+      <table class="grid">
+        <tr><th style="width:36px"></th><th>待辦事項</th><th style="width:50px">優先</th><th style="width:90px">截止日</th><th style="width:70px">來源</th></tr>
+        <tr><td><div class="chk" onclick="this.classList.toggle('on')"></div></td><td>審核 10月請假申請（3件）</td><td><span class="pri pri-h">高</span></td><td>今天 18:00</td><td>BPM</td></tr>
+        <tr><td><div class="chk" onclick="this.classList.toggle('on')"></div></td><td>提交部門月報</td><td><span class="pri pri-m">中</span></td><td>明天</td><td>主管</td></tr>
+        <tr><td><div class="chk" onclick="this.classList.toggle('on')"></div></td><td>確認新進人員報到資料</td><td><span class="pri pri-l">低</span></td><td>本週五</td><td>HRM</td></tr>
+        <tr><td><div class="chk" onclick="this.classList.toggle('on')"></div></td><td>簽署保密協議更新版</td><td><span class="pri pri-m">中</span></td><td>10/20</td><td>ISO</td></tr>
+        <tr><td><div class="chk" onclick="this.classList.toggle('on')"></div></td><td>填寫滿意度調查問卷</td><td><span class="pri pri-l">低</span></td><td>10/25</td><td>人資</td></tr>
+      </table>
     </div>
 
-    <!-- ===== 行事曆頁 ===== -->
-    <div class="page-section" id="page-calendar">
-      <div class="list-card">
-        <div class="list-item">
-          <div class="icon-box" style="background:#2b6cb0">12</div>
-          <div class="info">
-            <div class="title">部門週會</div>
-            <div class="desc">今天 10:00 – 11:00 · 會議室 A</div>
-          </div>
-        </div>
-        <div class="list-item">
-          <div class="icon-box" style="background:#c05621">12</div>
-          <div class="info">
-            <div class="title">客戶拜訪 – 台積電</div>
-            <div class="desc">今天 14:30 – 16:00 · 外出</div>
-          </div>
-        </div>
-        <div class="list-item">
-          <div class="icon-box" style="background:#2f855a">15</div>
-          <div class="info">
-            <div class="title">全員教育訓練</div>
-            <div class="desc">10/15 09:00 – 12:00 · 大禮堂</div>
-          </div>
-        </div>
-        <div class="list-item">
-          <div class="icon-box" style="background:#6b46c1">20</div>
-          <div class="info">
-            <div class="title">季度經營檢討會</div>
-            <div class="desc">10/20 13:30 – 16:00 · 大會議室</div>
-          </div>
-        </div>
-        <div class="list-item">
-          <div class="icon-box" style="background:#c53030">28</div>
-          <div class="info">
-            <div class="title">公司周年慶活動</div>
-            <div class="desc">10/28 全天 · 外燴會場</div>
-          </div>
-        </div>
-      </div>
+    <!-- 行事曆 -->
+    <div class="page" id="p-calendar">
+      <div class="crumb"><b>PowerEIP</b> 〉 行事曆</div>
+      <table class="grid">
+        <tr><th style="width:90px">日期</th><th>行程名稱</th><th style="width:110px">時間</th><th style="width:90px">地點</th></tr>
+        <tr><td>10/12（一）</td><td>部門週會</td><td>10:00 – 11:00</td><td>會議室 A</td></tr>
+        <tr><td>10/12（一）</td><td>客戶拜訪 – 台積電</td><td>14:30 – 16:00</td><td>外出</td></tr>
+        <tr><td>10/15（四）</td><td>全員教育訓練</td><td>09:00 – 12:00</td><td>大禮堂</td></tr>
+        <tr><td>10/20（二）</td><td>季度經營檢討會</td><td>13:30 – 16:00</td><td>大會議室</td></tr>
+        <tr><td>10/28（三）</td><td>公司周年慶活動</td><td>全天</td><td>外燴會場</td></tr>
+      </table>
     </div>
 
-    <!-- ===== 文件中心 ===== -->
-    <div class="page-section" id="page-docs">
-      <div class="list-card">
-        <div class="list-item">
-          <div class="icon-box" style="background:#2b6cb0">PDF</div>
-          <div class="info">
-            <div class="title">人資規章手冊_v3.2.pdf</div>
-            <div class="desc">人資部 · 更新於 10/08 · 2.4 MB</div>
-          </div>
-        </div>
-        <div class="list-item">
-          <div class="icon-box" style="background:#2f855a">XLS</div>
-          <div class="info">
-            <div class="title">2026 Q3 營運報告.xlsx</div>
-            <div class="desc">財務部 · 更新於 10/05 · 1.8 MB</div>
-          </div>
-        </div>
-        <div class="list-item">
-          <div class="icon-box" style="background:#c05621">ZIP</div>
-          <div class="info">
-            <div class="title">ISO 9001 程序文件.zip</div>
-            <div class="desc">品保部 · 更新於 09/28 · 15.2 MB</div>
-          </div>
-        </div>
-        <div class="list-item">
-          <div class="icon-box" style="background:#6b46c1">PPT</div>
-          <div class="info">
-            <div class="title">新進人員訓練教材.pptx</div>
-            <div class="desc">人資部 · 更新於 09/20 · 8.7 MB</div>
-          </div>
-        </div>
-        <div class="list-item">
-          <div class="icon-box" style="background:#4a5568">DIR</div>
-          <div class="info">
-            <div class="title">部門共用資料夾</div>
-            <div class="desc">人資部 · 共 128 個檔案</div>
-          </div>
-        </div>
-      </div>
+    <!-- 文件 -->
+    <div class="page" id="p-docs">
+      <div class="crumb"><b>PowerEIP</b> 〉 文件中心</div>
+      <table class="grid">
+        <tr><th style="width:50px">類型</th><th>檔案名稱</th><th style="width:70px">單位</th><th style="width:90px">更新日期</th><th style="width:70px">大小</th></tr>
+        <tr><td>PDF</td><td>人資規章手冊_v3.2.pdf</td><td>人資部</td><td>2026/10/08</td><td>2.4 MB</td></tr>
+        <tr><td>XLS</td><td>2026 Q3 營運報告.xlsx</td><td>財務部</td><td>2026/10/05</td><td>1.8 MB</td></tr>
+        <tr><td>ZIP</td><td>ISO 9001 程序文件.zip</td><td>品保部</td><td>2026/09/28</td><td>15.2 MB</td></tr>
+        <tr><td>PPT</td><td>新進人員訓練教材.pptx</td><td>人資部</td><td>2026/09/20</td><td>8.7 MB</td></tr>
+        <tr><td>DIR</td><td>部門共用資料夾</td><td>人資部</td><td>—</td><td>128 檔</td></tr>
+      </table>
     </div>
 
-    <!-- ===== 系統入口 ===== -->
-    <div class="page-section" id="page-systems">
-      <div class="list-card">
-        <div class="list-item">
-          <div class="icon-box" style="background:#2b6cb0">HR</div>
-          <div class="info">
-            <div class="title">PowerHRM – 人資系統</div>
-            <div class="desc">人事、差勤、請假、薪資</div>
-          </div>
-        </div>
-        <div class="list-item">
-          <div class="icon-box" style="background:#2f855a">BPM</div>
-          <div class="info">
-            <div class="title">PowerBPM – 流程管理</div>
-            <div class="desc">表單簽核、流程追蹤</div>
-          </div>
-        </div>
-        <div class="list-item">
-          <div class="icon-box" style="background:#c05621">ERP</div>
-          <div class="info">
-            <div class="title">PowerERP – 營運管理</div>
-            <div class="desc">財務、採購、庫存、生產、銷售</div>
-          </div>
-        </div>
-        <div class="list-item">
-          <div class="icon-box" style="background:#6b46c1">ISO</div>
-          <div class="info">
-            <div class="title">PowerISO – 文件與制度</div>
-            <div class="desc">文件版本、權限、稽核軌跡</div>
-          </div>
-        </div>
-        <div class="list-item">
-          <div class="icon-box" style="background:#4a5568">MAIL</div>
-          <div class="info">
-            <div class="title">企業信箱</div>
-            <div class="desc">Outlook / 內部郵件系統</div>
-          </div>
-        </div>
-        <div class="list-item">
-          <div class="icon-box" style="background:#2c7a7b">IM</div>
-          <div class="info">
-            <div class="title">即時通訊</div>
-            <div class="desc">Teams / 內部聊天</div>
-          </div>
-        </div>
-      </div>
+    <!-- 系統 -->
+    <div class="page" id="p-systems">
+      <div class="crumb"><b>PowerEIP</b> 〉 系統入口</div>
+      <table class="grid">
+        <tr><th style="width:70px">代碼</th><th>系統名稱</th><th>說明</th></tr>
+        <tr><td><b>HRM</b></td><td>PowerHRM – 人資系統</td><td>人事、差勤、請假、薪資</td></tr>
+        <tr><td><b>BPM</b></td><td>PowerBPM – 流程管理</td><td>表單簽核、流程追蹤</td></tr>
+        <tr><td><b>ERP</b></td><td>PowerERP – 營運管理</td><td>財務、採購、庫存、生產、銷售</td></tr>
+        <tr><td><b>ISO</b></td><td>PowerISO – 文件與制度</td><td>文件版本、權限、稽核軌跡</td></tr>
+        <tr><td><b>MAIL</b></td><td>企業信箱</td><td>Outlook / 內部郵件系統</td></tr>
+        <tr><td><b>IM</b></td><td>即時通訊</td><td>Teams / 內部聊天</td></tr>
+      </table>
     </div>
 
   </div>
 </div>
 
 <script>
-  const pageTitles = {
-    home: '首頁',
-    announce: '公告',
-    todo: '我的待辦',
-    calendar: '行事曆',
-    docs: '文件中心',
-    systems: '系統入口'
-  };
-
-  function switchPage(page) {
-    document.querySelectorAll('.page-section').forEach(el => el.classList.remove('active'));
-    document.getElementById('page-' + page).classList.add('active');
-    document.getElementById('pageTitle').textContent = pageTitles[page] || page;
-    document.querySelectorAll('.nav-item').forEach(el => {
-      el.classList.toggle('active', el.dataset.page === page);
+  function go(p) {
+    document.querySelectorAll('.page').forEach(el => el.classList.remove('on'));
+    document.getElementById('p-' + p).classList.add('on');
+    document.querySelectorAll('.side-item').forEach(el => {
+      el.classList.toggle('active', el.dataset.p === p);
     });
-    closeSidebar();
+    closeSide();
   }
-
-  function toggleSidebar() {
-    document.getElementById('sidebar').classList.toggle('open');
-    document.getElementById('overlay').classList.toggle('show');
+  function toggleSide() {
+    document.getElementById('side').classList.toggle('open');
+    document.getElementById('mask').classList.toggle('on');
   }
-
-  function closeSidebar() {
-    document.getElementById('sidebar').classList.remove('open');
-    document.getElementById('overlay').classList.remove('show');
+  function closeSide() {
+    document.getElementById('side').classList.remove('open');
+    document.getElementById('mask').classList.remove('on');
   }
 </script>
 </body>
