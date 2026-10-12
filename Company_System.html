@@ -29,27 +29,32 @@
         body {
             background-color: #3a6ea5;
             margin: 0;
-            padding: 5px;
+            padding: 4px;
             display: flex;
             justify-content: center;
-            align-items: flex-start;
-            min-height: 100vh;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
         }
 
         .zoom-wrapper {
             transform-origin: top center;
             transition: transform 0.1s ease;
-            width: 100%;
-            /* 讓版面改為滿版，不留過多藍色邊框 */
-            max-width: 99vw; 
+            width: 99.5vw;
+            height: 98vh;
+            display: flex;
+            flex-direction: column;
         }
 
         .window {
             background-color: var(--win-bg);
             border: 2px solid;
             border-color: var(--win-border-light) var(--win-border-darker) var(--win-border-darker) var(--win-border-light);
-            box-shadow: 2px 2px 5px rgba(0,0,0,0.4);
+            box-shadow: 2px 2px 8px rgba(0,0,0,0.5);
             width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
             padding: 3px;
         }
 
@@ -176,6 +181,8 @@
             padding: 8px;
             border: 1px solid;
             border-color: var(--win-border-dark) var(--win-border-light) var(--win-border-light) var(--win-border-dark);
+            flex: 1;
+            overflow-y: auto;
         }
 
         .tab-content.active {
@@ -230,11 +237,11 @@
 
         .table-container {
             width: 100%;
-            overflow-x: auto;
+            overflow: auto;
             border: 1px solid;
             border-color: var(--win-border-dark) var(--win-border-light) var(--win-border-light) var(--win-border-dark);
             background: #fff;
-            max-height: 450px;
+            max-height: 62vh;
         }
 
         .erp-table {
@@ -579,7 +586,7 @@
 
         <!-- 底部狀態列 -->
         <div class="statusbar">
-            <span id="status-msg">系統狀態：就緒 | 鼎新 e-Go ERP 5.0 滿版旗艦介面</span>
+            <span id="status-msg">系統狀態：就緒 | 鼎新 e-Go ERP 5.0 上下滿版旗艦介面</span>
             <span id="record-count">總筆數：就緒</span>
         </div>
     </div>
