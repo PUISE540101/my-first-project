@@ -29,7 +29,7 @@
         body {
             background-color: #3a6ea5;
             margin: 0;
-            padding: 10px;
+            padding: 5px;
             display: flex;
             justify-content: center;
             align-items: flex-start;
@@ -40,7 +40,8 @@
             transform-origin: top center;
             transition: transform 0.1s ease;
             width: 100%;
-            max-width: 1150px;
+            /* 讓版面改為滿版，不留過多藍色邊框 */
+            max-width: 99vw; 
         }
 
         .window {
@@ -141,7 +142,6 @@
             justify-content: center;
         }
 
-        /* 大模組導覽列 (對應圖中五大類別) */
         .system-tabs {
             display: flex;
             gap: 2px;
@@ -149,6 +149,7 @@
             border-bottom: 2px solid var(--header-green);
             padding-left: 2px;
             background: #e2e8f0;
+            flex-wrap: wrap;
         }
 
         .sys-tab {
@@ -201,7 +202,7 @@
 
         .form-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
             gap: 6px 12px;
             margin-top: 4px;
         }
@@ -233,7 +234,7 @@
             border: 1px solid;
             border-color: var(--win-border-dark) var(--win-border-light) var(--win-border-light) var(--win-border-dark);
             background: #fff;
-            max-height: 380px;
+            max-height: 450px;
         }
 
         .erp-table {
@@ -245,8 +246,8 @@
 
         .erp-table th, .erp-table td {
             border: 1px solid #c0c0c0;
-            padding: 4px;
-            height: 24px;
+            padding: 5px;
+            height: 26px;
         }
 
         .erp-table th {
@@ -265,8 +266,8 @@
             z-index: 11;
             font-weight: bold;
             text-align: left;
-            padding-left: 6px;
-            width: 110px;
+            padding-left: 8px;
+            width: 120px;
         }
 
         .shift-cell {
@@ -311,7 +312,7 @@
     <div class="window">
         <!-- 視窗標題列 -->
         <div class="window-header">
-            <span>鼎新 e-Go ERP 5.0 - [五大管理系統營運整合整合平台]</span>
+            <span>鼎新 e-Go ERP 5.0 - [五大管理系統營運整合平台]</span>
             <div class="window-controls">
                 <div class="win-btn">_</div>
                 <div class="win-btn">□</div>
@@ -358,7 +359,7 @@
             </div>
         </div>
 
-        <!-- 公司管理系統 五大類別導覽列 (對應截圖圖示) -->
+        <!-- 公司管理系統 五大類別導覽列 -->
         <div class="system-tabs">
             <div class="sys-tab active" onclick="switchSys(0)">📈 1. ERP 營運資料</div>
             <div class="sys-tab" onclick="switchSys(1)">👥 2. HRM 人資出勤</div>
@@ -367,14 +368,14 @@
             <div class="sys-tab" onclick="switchSys(4)">📁 5. 文件 / ISO 制度</div>
         </div>
 
-        <!-- 系統 1：ERP (營運資料：財務、採購、庫存、生產、銷售) -->
+        <!-- 系統 1：ERP -->
         <div id="sys-0" class="tab-content active">
             <div class="group-box">
                 <div class="group-title">ERP 核心模組 - 銷貨進銷存與進度總覽</div>
                 <div class="form-grid">
                     <div class="form-row">
                         <label>模組切換：</label>
-                        <select id="erp-module-select" onchange="renderErpModule()">
+                        <select id="erp-module-select">
                             <option value="PUR">採購與訂單管理 (PO)</option>
                             <option value="INV">庫存異動與盤點 (INV)</option>
                             <option value="FIN">財務與應收帳款 (AR/AP)</option>
@@ -384,7 +385,7 @@
             </div>
 
             <div class="group-box">
-                <div class="group-title" id="erp-table-title">進銷存營運資料表</div>
+                <div class="group-title">進銷存營運資料表</div>
                 <div class="table-container">
                     <table class="erp-table">
                         <thead>
@@ -398,7 +399,7 @@
                                 <th>狀態</th>
                             </tr>
                         </thead>
-                        <tbody id="erp-tbody">
+                        <tbody>
                             <tr>
                                 <td>PO-202610-001</td>
                                 <td>2026-10-12</td>
@@ -423,7 +424,7 @@
             </div>
         </div>
 
-        <!-- 系統 2：HRM (人：人事、差勤、出勤、假勤管理) -->
+        <!-- 系統 2：HRM -->
         <div id="sys-1" class="tab-content">
             <div class="group-box">
                 <div class="group-title">HRM 人資出勤管理 - 排班與假勤結算</div>
@@ -448,7 +449,7 @@
             </div>
         </div>
 
-        <!-- 系統 3：BPM (流程：電子表單、簽核、跨部門流程) -->
+        <!-- 系統 3：BPM -->
         <div id="sys-2" class="tab-content">
             <div class="group-box">
                 <div class="group-title">BPM 電子表單與跨部門簽核中心</div>
@@ -492,11 +493,11 @@
             </div>
         </div>
 
-        <!-- 系統 4：EIP / OA (入口與協作：公告、行事曆、待辦、統一入口) -->
+        <!-- 系統 4：EIP / OA -->
         <div id="sys-3" class="tab-content">
             <div class="group-box">
                 <div class="group-title">EIP 企業資訊入口 - 公司最新公告</div>
-                <div style="background:#fff; padding:8px; border:1px solid var(--win-border-dark);">
+                <div style="background:#fff; padding:10px; border:1px solid var(--win-border-dark);">
                     <ul style="margin:0; padding-left:20px; line-height:1.8;">
                         <li><b>【行政公告】</b> 2026 年 10 月份員工考勤排班表已發佈，請同仁核對。</li>
                         <li><b>【系統升級】</b> 鼎新 e-Go ERP 5.0 五大核心模組即日起上線運作。</li>
@@ -526,23 +527,16 @@
                                 <td>2026-10-15</td>
                                 <td><span style="color:orange;">進行中</span></td>
                             </tr>
-                            <tr>
-                                <td>中</td>
-                                <td>辦公室印表機耗材補充採購</td>
-                                <td>總務科</td>
-                                <td>2026-10-18</td>
-                                <td><span style="color:gray;">未開始</span></td>
-                            </tr>
                         </tbody>
                     </table>
                 </div>
             </div>
         </div>
 
-        <!-- 系統 5：文件 / ISO (制度與文件：版本、權限、審核、稽核軌跡) -->
+        <!-- 系統 5：文件 / ISO -->
         <div id="sys-4" class="tab-content">
             <div class="group-box">
-                <div class="group-title">文件 / ISO 管理系統 - 新增ISO規範文件</div>
+                <div class="group-title">文件 / ISO 管理系統 - 新增規範文件</div>
                 <div class="form-grid">
                     <div class="form-row">
                         <label>文件編號：</label>
@@ -563,7 +557,7 @@
             </div>
 
             <div class="group-box">
-                <div class="group-title">ISO 標準作業程序與制度文件總表 (帶有版本與稽核軌跡)</div>
+                <div class="group-title">ISO 標準作業程序與制度文件總表</div>
                 <div class="table-container">
                     <table class="erp-table">
                         <thead>
@@ -585,7 +579,7 @@
 
         <!-- 底部狀態列 -->
         <div class="statusbar">
-            <span id="status-msg">系統狀態：就緒 | 整合 ERP、HRM、BPM、EIP、ISO 五大管理模組</span>
+            <span id="status-msg">系統狀態：就緒 | 鼎新 e-Go ERP 5.0 滿版旗艦介面</span>
             <span id="record-count">總筆數：就緒</span>
         </div>
     </div>
@@ -623,7 +617,6 @@
         });
     }
 
-    // --- HRM 邏輯 ---
     function getEmployees() {
         const data = localStorage.getItem('ego_v5_emps');
         return data ? JSON.parse(data) : [
@@ -799,7 +792,6 @@
         alert('📅 已套用週休二日範本！');
     }
 
-    // --- BPM 簽核邏輯 ---
     function getBpmForms() {
         const data = localStorage.getItem('ego_v5_bpm');
         return data ? JSON.parse(data) : [
@@ -849,7 +841,6 @@
         renderBpmTable();
     }
 
-    // --- ISO 文件邏輯 ---
     function getDocs() {
         const data = localStorage.getItem('ego_v5_docs');
         return data ? JSON.parse(data) : [
@@ -906,7 +897,6 @@
         alert('五大系統資料已成功儲存至 LocalStorage 資料庫！');
     }
 
-    // 初始化啟動
     initYearMonthSelectors();
     renderMatrixTable();
     renderBpmTable();
