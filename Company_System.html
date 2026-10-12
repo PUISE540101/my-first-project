@@ -1,0 +1,917 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>鼎新 e-Go ERP 5.0 - 全方位企業管理五大系統平台</title>
+    <style>
+        :root {
+            --win-bg: #d4d0c8;
+            --win-border-light: #ffffff;
+            --win-border-dark: #808080;
+            --win-border-darker: #404040;
+            --header-green: #005a5b;
+            --header-text: #ffffff;
+            --input-bg: #ffffff;
+            
+            --shift-early: #c6e2ff;
+            --shift-mid: #fff6c4;
+            --shift-night: #ffe0b2;
+            --shift-off: #e8e8e8;
+        }
+
+        * {
+            box-sizing: border-box;
+            font-family: "PMingLiU", "新細明體", "Microsoft JhengHei", sans-serif;
+            font-size: 12px;
+        }
+
+        body {
+            background-color: #3a6ea5;
+            margin: 0;
+            padding: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+        }
+
+        .zoom-wrapper {
+            transform-origin: top center;
+            transition: transform 0.1s ease;
+            width: 100%;
+            max-width: 1150px;
+        }
+
+        .window {
+            background-color: var(--win-bg);
+            border: 2px solid;
+            border-color: var(--win-border-light) var(--win-border-darker) var(--win-border-darker) var(--win-border-light);
+            box-shadow: 2px 2px 5px rgba(0,0,0,0.4);
+            width: 100%;
+            padding: 3px;
+        }
+
+        .window-header {
+            background-color: var(--header-green);
+            color: var(--header-text);
+            padding: 3px 6px;
+            font-weight: bold;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            letter-spacing: 1px;
+        }
+
+        .window-controls {
+            display: flex;
+            gap: 2px;
+        }
+
+        .win-btn {
+            width: 16px;
+            height: 14px;
+            background: var(--win-bg);
+            border: 1px solid;
+            border-color: var(--win-border-light) var(--win-border-dark) var(--win-border-dark) var(--win-border-light);
+            font-size: 9px;
+            line-height: 12px;
+            text-align: center;
+            cursor: pointer;
+            font-weight: bold;
+            color: #000;
+        }
+
+        .toolbar {
+            background-color: var(--win-bg);
+            display: flex;
+            gap: 2px;
+            padding: 4px 2px;
+            border-bottom: 1px solid var(--win-border-dark);
+            margin-bottom: 4px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .tool-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 48px;
+            height: 42px;
+            background: var(--win-bg);
+            border: 1px solid;
+            border-color: var(--win-border-light) var(--win-border-dark) var(--win-border-dark) var(--win-border-light);
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .tool-item:active {
+            border-color: var(--win-border-dark) var(--win-border-light) var(--win-border-light) var(--win-border-dark);
+        }
+
+        .tool-icon {
+            font-size: 13px;
+            margin-bottom: 2px;
+        }
+
+        .zoom-group {
+            display: flex;
+            align-items: center;
+            gap: 3px;
+            margin-left: auto;
+            padding: 0 4px;
+            background: var(--win-bg);
+            border: 1px solid;
+            border-color: var(--win-border-dark) var(--win-border-light) var(--win-border-light) var(--win-border-dark);
+            height: 42px;
+        }
+
+        .zoom-btn {
+            width: 24px;
+            height: 24px;
+            background: var(--win-bg);
+            border: 1px solid;
+            border-color: var(--win-border-light) var(--win-border-dark) var(--win-border-dark) var(--win-border-light);
+            cursor: pointer;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* 大模組導覽列 (對應圖中五大類別) */
+        .system-tabs {
+            display: flex;
+            gap: 2px;
+            margin-top: 2px;
+            border-bottom: 2px solid var(--header-green);
+            padding-left: 2px;
+            background: #e2e8f0;
+        }
+
+        .sys-tab {
+            padding: 6px 12px;
+            background: #cbd5e1;
+            border: 1px solid var(--win-border-dark);
+            border-bottom: none;
+            cursor: pointer;
+            font-weight: bold;
+            color: #334155;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .sys-tab.active {
+            background: var(--header-green);
+            color: #ffffff;
+            border-color: var(--header-green);
+        }
+
+        .tab-content {
+            display: none;
+            padding: 8px;
+            border: 1px solid;
+            border-color: var(--win-border-dark) var(--win-border-light) var(--win-border-light) var(--win-border-dark);
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .group-box {
+            border: 1px solid var(--win-border-dark);
+            padding: 8px;
+            margin-bottom: 8px;
+            position: relative;
+            background: var(--win-bg);
+        }
+
+        .group-title {
+            position: absolute;
+            top: -8px;
+            left: 10px;
+            background: var(--win-bg);
+            padding: 0 4px;
+            font-weight: bold;
+            color: #000080;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 6px 12px;
+            margin-top: 4px;
+        }
+
+        .form-row {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .form-row label {
+            width: 80px;
+            text-align: right;
+            color: #000;
+        }
+
+        input[type="text"], input[type="password"], input[type="number"], input[type="date"], select {
+            border: 1px solid;
+            border-color: var(--win-border-dark) var(--win-border-light) var(--win-border-light) var(--win-border-dark);
+            background: var(--input-bg);
+            padding: 2px 4px;
+            height: 22px;
+            flex: 1;
+        }
+
+        .table-container {
+            width: 100%;
+            overflow-x: auto;
+            border: 1px solid;
+            border-color: var(--win-border-dark) var(--win-border-light) var(--win-border-light) var(--win-border-dark);
+            background: #fff;
+            max-height: 380px;
+        }
+
+        .erp-table {
+            width: 100%;
+            border-collapse: collapse;
+            white-space: nowrap;
+            text-align: center;
+        }
+
+        .erp-table th, .erp-table td {
+            border: 1px solid #c0c0c0;
+            padding: 4px;
+            height: 24px;
+        }
+
+        .erp-table th {
+            background: #e0e0e0;
+            color: #000;
+            font-weight: bold;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .erp-table th.emp-col, .erp-table td.emp-col {
+            position: sticky;
+            left: 0;
+            background: #f0f0f0;
+            z-index: 11;
+            font-weight: bold;
+            text-align: left;
+            padding-left: 6px;
+            width: 110px;
+        }
+
+        .shift-cell {
+            cursor: pointer;
+            user-select: none;
+            font-weight: bold;
+        }
+
+        .shift-cell:hover { outline: 1px solid #000; }
+        .shift-cell[data-shift="early"] { background-color: var(--shift-early); color: #000080; }
+        .shift-cell[data-shift="mid"] { background-color: var(--shift-mid); color: #804000; }
+        .shift-cell[data-shift="night"] { background-color: var(--shift-night); color: #800000; }
+        .shift-cell[data-shift="off"] { background-color: var(--shift-off); color: #606060; }
+
+        .btn-win {
+            background: var(--win-bg);
+            border: 1px solid;
+            border-color: var(--win-border-light) var(--win-border-dark) var(--win-border-dark) var(--win-border-light);
+            padding: 2px 10px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .btn-win:active {
+            border-color: var(--win-border-dark) var(--win-border-light) var(--win-border-light) var(--win-border-dark);
+        }
+
+        .statusbar {
+            margin-top: 4px;
+            padding: 2px 6px;
+            border: 1px solid;
+            border-color: var(--win-border-dark) var(--win-border-light) var(--win-border-light) var(--win-border-dark);
+            background: var(--win-bg);
+            color: #333;
+            display: flex;
+            justify-content: space-between;
+        }
+    </style>
+</head>
+<body>
+
+<div class="zoom-wrapper" id="zoom-wrapper">
+    <div class="window">
+        <!-- 視窗標題列 -->
+        <div class="window-header">
+            <span>鼎新 e-Go ERP 5.0 - [五大管理系統營運整合整合平台]</span>
+            <div class="window-controls">
+                <div class="win-btn">_</div>
+                <div class="win-btn">□</div>
+                <div class="win-btn" onclick="alert('系統已鎖定')">✕</div>
+            </div>
+        </div>
+
+        <!-- ERP 功能工具列 -->
+        <div class="toolbar">
+            <div class="tool-item" onclick="alert('進入新增模式')">
+                <span class="tool-icon" style="color: green;">✚</span>
+                <span>新增</span>
+            </div>
+            <div class="tool-item" onclick="alert('進入修改模式')">
+                <span class="tool-icon" style="color: blue;">✏</span>
+                <span>修改</span>
+            </div>
+            <div class="tool-item" onclick="alert('刪除資料')">
+                <span class="tool-icon" style="color: red;">✖</span>
+                <span>刪除</span>
+            </div>
+            <div class="tool-item" onclick="saveAllData()">
+                <span class="tool-icon" style="color: darkgreen;">💾</span>
+                <span>存檔</span>
+            </div>
+            <div class="tool-item" onclick="exportToCSV()">
+                <span class="tool-icon" style="color: darkblue;">📊</span>
+                <span>匯出</span>
+            </div>
+            <div class="tool-item" onclick="alert('列印報表預覽中...')">
+                <span class="tool-icon" style="color: purple;">🖨</span>
+                <span>列印</span>
+            </div>
+            <div class="tool-item" onclick="alert('已登出系統')">
+                <span class="tool-icon">🚪</span>
+                <span>離開</span>
+            </div>
+
+            <div class="zoom-group">
+                <span style="font-weight: bold; margin-right: 2px;">顯示比例:</span>
+                <button class="zoom-btn" onclick="adjustZoom(-0.1)">-</button>
+                <button class="zoom-btn" onclick="resetZoom()" id="zoom-display" style="width: 42px;">100%</button>
+                <button class="zoom-btn" onclick="adjustZoom(0.1)">+</button>
+            </div>
+        </div>
+
+        <!-- 公司管理系統 五大類別導覽列 (對應截圖圖示) -->
+        <div class="system-tabs">
+            <div class="sys-tab active" onclick="switchSys(0)">📈 1. ERP 營運資料</div>
+            <div class="sys-tab" onclick="switchSys(1)">👥 2. HRM 人資出勤</div>
+            <div class="sys-tab" onclick="switchSys(2)">🔀 3. BPM 電子簽核</div>
+            <div class="sys-tab" onclick="switchSys(3)">🌐 4. EIP / OA 協作門戶</div>
+            <div class="sys-tab" onclick="switchSys(4)">📁 5. 文件 / ISO 制度</div>
+        </div>
+
+        <!-- 系統 1：ERP (營運資料：財務、採購、庫存、生產、銷售) -->
+        <div id="sys-0" class="tab-content active">
+            <div class="group-box">
+                <div class="group-title">ERP 核心模組 - 銷貨進銷存與進度總覽</div>
+                <div class="form-grid">
+                    <div class="form-row">
+                        <label>模組切換：</label>
+                        <select id="erp-module-select" onchange="renderErpModule()">
+                            <option value="PUR">採購與訂單管理 (PO)</option>
+                            <option value="INV">庫存異動與盤點 (INV)</option>
+                            <option value="FIN">財務與應收帳款 (AR/AP)</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="group-box">
+                <div class="group-title" id="erp-table-title">進銷存營運資料表</div>
+                <div class="table-container">
+                    <table class="erp-table">
+                        <thead>
+                            <tr>
+                                <th>單據編號</th>
+                                <th>交易日期</th>
+                                <th>客戶/廠商</th>
+                                <th>品名與規格</th>
+                                <th>數量</th>
+                                <th>金額 (NT$)</th>
+                                <th>狀態</th>
+                            </tr>
+                        </thead>
+                        <tbody id="erp-tbody">
+                            <tr>
+                                <td>PO-202610-001</td>
+                                <td>2026-10-12</td>
+                                <td>鼎新科技</td>
+                                <td>伺服器設備</td>
+                                <td>2</td>
+                                <td>$120,000</td>
+                                <td><span style="color:green; font-weight:bold;">已入庫</span></td>
+                            </tr>
+                            <tr>
+                                <td>SO-202610-008</td>
+                                <td>2026-10-11</td>
+                                <td>宏碁電腦</td>
+                                <td>ERP 軟體授權</td>
+                                <td>5</td>
+                                <td>$250,000</td>
+                                <td><span style="color:blue; font-weight:bold;">已出貨</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- 系統 2：HRM (人：人事、差勤、出勤、假勤管理) -->
+        <div id="sys-1" class="tab-content">
+            <div class="group-box">
+                <div class="group-title">HRM 人資出勤管理 - 排班與假勤結算</div>
+                <div class="form-grid">
+                    <div class="form-row">
+                        <label>排班年份：</label>
+                        <select id="year-select" onchange="renderMatrixTable()"></select>
+                    </div>
+                    <div class="form-row">
+                        <label>排班月份：</label>
+                        <select id="month-select" onchange="renderMatrixTable()"></select>
+                    </div>
+                    <div class="form-row" style="gap: 4px;">
+                        <button class="btn-win" onclick="autoGenerateSchedule()" style="background-color: #fef08a;">⚡ 自動輪班</button>
+                        <button class="btn-win" onclick="applyWeekendOff()" style="background-color: #dbeafe;">📅 週休二日</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="table-container">
+                <table class="erp-table" id="schedule-table"></table>
+            </div>
+        </div>
+
+        <!-- 系統 3：BPM (流程：電子表單、簽核、跨部門流程) -->
+        <div id="sys-2" class="tab-content">
+            <div class="group-box">
+                <div class="group-title">BPM 電子表單與跨部門簽核中心</div>
+                <div class="form-grid">
+                    <div class="form-row">
+                        <label>表單類型：</label>
+                        <select id="bpm-type">
+                            <option value="請假單">員工請假申請單</option>
+                            <option value="請購單">行政採購請購單</option>
+                            <option value="出差單">國內外差旅報支單</option>
+                        </select>
+                    </div>
+                    <div class="form-row">
+                        <label>申請說明：</label>
+                        <input type="text" id="bpm-reason" placeholder="請輸入申請事由...">
+                    </div>
+                    <div class="form-row">
+                        <button class="btn-win" onclick="submitBpmForm()" style="background-color: #d1fae5;">✍️ 發起簽核流程</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="group-box">
+                <div class="group-title">待簽核與進行中表單軌跡</div>
+                <div class="table-container">
+                    <table class="erp-table">
+                        <thead>
+                            <tr>
+                                <th>表單編號</th>
+                                <th>申請人</th>
+                                <th>表單類型</th>
+                                <th>申請事由</th>
+                                <th>當前簽核關卡</th>
+                                <th>簽核狀態</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="bpm-tbody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- 系統 4：EIP / OA (入口與協作：公告、行事曆、待辦、統一入口) -->
+        <div id="sys-3" class="tab-content">
+            <div class="group-box">
+                <div class="group-title">EIP 企業資訊入口 - 公司最新公告</div>
+                <div style="background:#fff; padding:8px; border:1px solid var(--win-border-dark);">
+                    <ul style="margin:0; padding-left:20px; line-height:1.8;">
+                        <li><b>【行政公告】</b> 2026 年 10 月份員工考勤排班表已發佈，請同仁核對。</li>
+                        <li><b>【系統升級】</b> 鼎新 e-Go ERP 5.0 五大核心模組即日起上線運作。</li>
+                        <li><b>【財務提醒】</b> 9 月份差旅費用請款請於本週五前送交簽核。</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="group-box">
+                <div class="group-title">個人今日待辦事項與工作協作 (OA)</div>
+                <div class="table-container">
+                    <table class="erp-table">
+                        <thead>
+                            <tr>
+                                <th>優先級</th>
+                                <th>待辦工作內容</th>
+                                <th>指派部門</th>
+                                <th>預計完成日</th>
+                                <th>狀態</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td style="color:red; font-weight:bold;">高</td>
+                                <td>核對 10 月份 HRM 班別津貼與薪資報表</td>
+                                <td>管理部</td>
+                                <td>2026-10-15</td>
+                                <td><span style="color:orange;">進行中</span></td>
+                            </tr>
+                            <tr>
+                                <td>中</td>
+                                <td>辦公室印表機耗材補充採購</td>
+                                <td>總務科</td>
+                                <td>2026-10-18</td>
+                                <td><span style="color:gray;">未開始</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- 系統 5：文件 / ISO (制度與文件：版本、權限、審核、稽核軌跡) -->
+        <div id="sys-4" class="tab-content">
+            <div class="group-box">
+                <div class="group-title">文件 / ISO 管理系統 - 新增ISO規範文件</div>
+                <div class="form-grid">
+                    <div class="form-row">
+                        <label>文件編號：</label>
+                        <input type="text" id="doc-id" placeholder="例: ISO-SOP-001">
+                    </div>
+                    <div class="form-row">
+                        <label>文件名稱：</label>
+                        <input type="text" id="doc-name" placeholder="例: 資訊安全管理程序">
+                    </div>
+                    <div class="form-row">
+                        <label>版本號：</label>
+                        <input type="text" id="doc-ver" value="V1.0">
+                    </div>
+                    <div class="form-row">
+                        <button class="btn-win" onclick="addDocInfo()" style="background-color: #d1fae5;">📁 歸檔新文件</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="group-box">
+                <div class="group-title">ISO 標準作業程序與制度文件總表 (帶有版本與稽核軌跡)</div>
+                <div class="table-container">
+                    <table class="erp-table">
+                        <thead>
+                            <tr>
+                                <th>文件編號</th>
+                                <th>文件名稱</th>
+                                <th>版本</th>
+                                <th>調閱權限</th>
+                                <th>最近審核日</th>
+                                <th>稽核狀態</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="doc-tbody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- 底部狀態列 -->
+        <div class="statusbar">
+            <span id="status-msg">系統狀態：就緒 | 整合 ERP、HRM、BPM、EIP、ISO 五大管理模組</span>
+            <span id="record-count">總筆數：就緒</span>
+        </div>
+    </div>
+</div>
+
+<script>
+    let currentDate = new Date();
+    let currentZoom = 1.0;
+
+    function adjustZoom(amount) {
+        currentZoom += amount;
+        if (currentZoom < 0.7) currentZoom = 0.7;
+        if (currentZoom > 1.5) currentZoom = 1.5;
+        applyZoom();
+    }
+
+    function resetZoom() {
+        currentZoom = 1.0;
+        applyZoom();
+    }
+
+    function applyZoom() {
+        document.getElementById('zoom-wrapper').style.transform = `scale(${currentZoom})`;
+        document.getElementById('zoom-display').textContent = `${Math.round(currentZoom * 100)}%`;
+    }
+
+    function switchSys(index) {
+        document.querySelectorAll('.sys-tab').forEach((t, i) => {
+            if (i === index) t.classList.add('active');
+            else t.classList.remove('active');
+        });
+        document.querySelectorAll('.tab-content').forEach((c, i) => {
+            if (i === index) c.classList.add('active');
+            else c.classList.remove('active');
+        });
+    }
+
+    // --- HRM 邏輯 ---
+    function getEmployees() {
+        const data = localStorage.getItem('ego_v5_emps');
+        return data ? JSON.parse(data) : [
+            { id: 'P001', name: '王小明', dept: 'D01 業務部' },
+            { id: 'P002', name: '李小華', dept: 'D02 資訊部' },
+            { id: 'P003', name: '張大山', dept: 'D03 生管部' },
+            { id: 'P004', name: '陳美麗', dept: 'D04 財務部' }
+        ];
+    }
+
+    const shifts = [
+        { key: '', label: '' },
+        { key: 'early', label: '早' },
+        { key: 'mid', label: '中' },
+        { key: 'night', label: '晚' },
+        { key: 'off', label: '休' }
+    ];
+
+    function initYearMonthSelectors() {
+        const yearSelect = document.getElementById('year-select');
+        yearSelect.innerHTML = '';
+        const currentYear = currentDate.getFullYear();
+        for (let y = currentYear - 2; y <= currentYear + 2; y++) {
+            let opt = document.createElement('option');
+            opt.value = y;
+            opt.textContent = `${y} 年`;
+            if (y === currentYear) opt.selected = true;
+            yearSelect.appendChild(opt);
+        }
+
+        const monthSelect = document.getElementById('month-select');
+        monthSelect.innerHTML = '';
+        for (let m = 0; m < 12; m++) {
+            let opt = document.createElement('option');
+            opt.value = m;
+            opt.textContent = `${m + 1} 月`;
+            if (m === currentDate.getMonth()) opt.selected = true;
+            monthSelect.appendChild(opt);
+        }
+    }
+
+    function getStorageKey(year, month) {
+        return `ego_v5_schedule_${year}_${month}`;
+    }
+
+    function renderMatrixTable() {
+        const year = parseInt(document.getElementById('year-select').value);
+        const month = parseInt(document.getElementById('month-select').value);
+        const table = document.getElementById('schedule-table');
+        table.innerHTML = '';
+
+        const totalDays = new Date(year, month + 1, 0).getDate();
+        let employees = getEmployees();
+        const dataKey = getStorageKey(year, month);
+        let monthData = JSON.parse(localStorage.getItem(dataKey)) || {};
+
+        let headerTr = document.createElement('tr');
+        let thEmp = document.createElement('th');
+        thEmp.className = 'emp-col';
+        thEmp.textContent = '員工姓名';
+        headerTr.appendChild(thEmp);
+
+        for (let day = 1; day <= totalDays; day++) {
+            let th = document.createElement('th');
+            let weekDay = new Date(year, month, day).getDay();
+            let weekChars = ['日', '一', '二', '三', '四', '五', '六'];
+            th.innerHTML = `${day}<br><span style="font-size:10px; font-weight:normal;">${weekChars[weekDay]}</span>`;
+            if (weekDay === 0 || weekDay === 6) th.style.color = 'red';
+            headerTr.appendChild(th);
+        }
+
+        ['早', '中', '晚', '休'].forEach(s => {
+            let th = document.createElement('th');
+            th.textContent = s;
+            headerTr.appendChild(th);
+        });
+        table.appendChild(headerTr);
+
+        employees.forEach(emp => {
+            let empKey = `${emp.id} ${emp.name}`;
+            if (!monthData[empKey]) monthData[empKey] = {};
+
+            let tr = document.createElement('tr');
+            let tdEmp = document.createElement('td');
+            tdEmp.className = 'emp-col';
+            tdEmp.textContent = empKey;
+            tr.appendChild(tdEmp);
+
+            let counts = { early: 0, mid: 0, night: 0, off: 0 };
+
+            for (let day = 1; day <= totalDays; day++) {
+                let td = document.createElement('td');
+                td.className = 'shift-cell';
+                
+                let currentKey = monthData[empKey][day] || '';
+                if (currentKey && counts[currentKey] !== undefined) counts[currentKey]++;
+                
+                let shiftObj = shifts.find(s => s.key === currentKey);
+                td.textContent = shiftObj ? shiftObj.label : '';
+                if (currentKey) td.setAttribute('data-shift', currentKey);
+
+                td.addEventListener('click', () => {
+                    let curKey = monthData[empKey][day] || '';
+                    let curIdx = shifts.findIndex(s => s.key === curKey);
+                    let nextIdx = (curIdx + 1) % shifts.length;
+                    let nextShift = shifts[nextIdx];
+
+                    if (nextShift.key === '') delete monthData[empKey][day];
+                    else monthData[empKey][day] = nextShift.key;
+
+                    localStorage.setItem(dataKey, JSON.stringify(monthData));
+                    renderMatrixTable();
+                });
+
+                tr.appendChild(td);
+            }
+
+            ['early', 'mid', 'night', 'off'].forEach(key => {
+                let tdStat = document.createElement('td');
+                tdStat.textContent = counts[key];
+                tdStat.style.fontWeight = 'bold';
+                tdStat.style.backgroundColor = '#f8f8f8';
+                tr.appendChild(tdStat);
+            });
+
+            table.appendChild(tr);
+        });
+    }
+
+    function autoGenerateSchedule() {
+        const year = parseInt(document.getElementById('year-select').value);
+        const month = parseInt(document.getElementById('month-select').value);
+        const totalDays = new Date(year, month + 1, 0).getDate();
+        const employees = getEmployees();
+        const dataKey = getStorageKey(year, month);
+        let monthData = {};
+
+        const shiftKeys = ['early', 'mid', 'night', 'off'];
+        employees.forEach((emp, empIdx) => {
+            let empKey = `${emp.id} ${emp.name}`;
+            monthData[empKey] = {};
+            for (let day = 1; day <= totalDays; day++) {
+                let shiftIdx = (empIdx + day) % shiftKeys.length;
+                monthData[empKey][day] = shiftKeys[shiftIdx];
+            }
+        });
+
+        localStorage.setItem(dataKey, JSON.stringify(monthData));
+        renderMatrixTable();
+        alert('⚡ 自動輪班完成！');
+    }
+
+    function applyWeekendOff() {
+        const year = parseInt(document.getElementById('year-select').value);
+        const month = parseInt(document.getElementById('month-select').value);
+        const totalDays = new Date(year, month + 1, 0).getDate();
+        const employees = getEmployees();
+        const dataKey = getStorageKey(year, month);
+        let monthData = JSON.parse(localStorage.getItem(dataKey)) || {};
+
+        employees.forEach(emp => {
+            let empKey = `${emp.id} ${emp.name}`;
+            if (!monthData[empKey]) monthData[empKey] = {};
+            for (let day = 1; day <= totalDays; day++) {
+                let weekDay = new Date(year, month, day).getDay();
+                if (weekDay === 0 || weekDay === 6) monthData[empKey][day] = 'off';
+                else if (!monthData[empKey][day]) monthData[empKey][day] = 'early';
+            }
+        });
+
+        localStorage.setItem(dataKey, JSON.stringify(monthData));
+        renderMatrixTable();
+        alert('📅 已套用週休二日範本！');
+    }
+
+    // --- BPM 簽核邏輯 ---
+    function getBpmForms() {
+        const data = localStorage.getItem('ego_v5_bpm');
+        return data ? JSON.parse(data) : [
+            { id: 'BPM-2026-001', name: '王小明', type: '請假單', reason: '事假 1 天', step: '部門主管審核', status: '進行中' },
+            { id: 'BPM-2026-002', name: '李小華', type: '請購單', reason: '採購測試用筆電', step: '總經理核准', status: '已核准' }
+        ];
+    }
+
+    function renderBpmTable() {
+        const tbody = document.getElementById('bpm-tbody');
+        tbody.innerHTML = '';
+        const list = getBpmForms();
+
+        list.forEach((b, idx) => {
+            let tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td><b>${b.id}</b></td>
+                <td>${b.name}</td>
+                <td>${b.type}</td>
+                <td>${b.reason}</td>
+                <td>${b.step}</td>
+                <td><span style="color:${b.status === '已核准' ? 'green' : 'orange'}; font-weight:bold;">${b.status}</span></td>
+                <td><button class="btn-win" style="color:red;" onclick="deleteBpm(${idx})">撤回</button></td>
+            `;
+            tbody.appendChild(tr);
+        });
+    }
+
+    function submitBpmForm() {
+        let type = document.getElementById('bpm-type').value;
+        let reason = document.getElementById('bpm-reason').value.trim();
+        if (!reason) { alert('請填寫申請事由！'); return; }
+
+        let list = getBpmForms();
+        let newId = `BPM-2026-0${list.length + 1}`;
+        list.push({ id: newId, name: '登入使用者', type, reason, step: '部門主管審核', status: '進行中' });
+        localStorage.setItem('ego_v5_bpm', JSON.stringify(list));
+        renderBpmTable();
+        document.getElementById('bpm-reason').value = '';
+        alert('發起簽核成功！');
+    }
+
+    function deleteBpm(idx) {
+        let list = getBpmForms();
+        list.splice(idx, 1);
+        localStorage.setItem('ego_v5_bpm', JSON.stringify(list));
+        renderBpmTable();
+    }
+
+    // --- ISO 文件邏輯 ---
+    function getDocs() {
+        const data = localStorage.getItem('ego_v5_docs');
+        return data ? JSON.parse(data) : [
+            { id: 'ISO-SOP-001', name: '資訊安全管理程序', ver: 'V2.1', auth: '全體員工', date: '2026-09-01', status: '通過稽核' },
+            { id: 'ISO-SOP-002', name: '行政總務採購作業標準', ver: 'V1.0', auth: '管理部', date: '2026-08-15', status: '通過稽核' }
+        ];
+    }
+
+    function renderDocTable() {
+        const tbody = document.getElementById('doc-tbody');
+        tbody.innerHTML = '';
+        const list = getDocs();
+
+        list.forEach((d, idx) => {
+            let tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td><b>${d.id}</b></td>
+                <td>${d.name}</td>
+                <td>${d.ver}</td>
+                <td>${d.auth}</td>
+                <td>${d.date}</td>
+                <td><span style="color:green; font-weight:bold;">${d.status}</span></td>
+                <td><button class="btn-win" style="color:red;" onclick="deleteDoc(${idx})">廢止</button></td>
+            `;
+            tbody.appendChild(tr);
+        });
+    }
+
+    function addDocInfo() {
+        let id = document.getElementById('doc-id').value.trim();
+        let name = document.getElementById('doc-name').value.trim();
+        let ver = document.getElementById('doc-ver').value.trim();
+        if (!id || !name) { alert('請填寫文件編號與名稱！'); return; }
+
+        let list = getDocs();
+        list.push({ id, name, ver, auth: '全體員工', date: '2026-10-12', status: '通過稽核' });
+        localStorage.setItem('ego_v5_docs', JSON.stringify(list));
+        renderDocTable();
+        alert('ISO 文件歸檔成功！');
+    }
+
+    function deleteDoc(idx) {
+        let list = getDocs();
+        list.splice(idx, 1);
+        localStorage.setItem('ego_v5_docs', JSON.stringify(list));
+        renderDocTable();
+    }
+
+    function exportToCSV() {
+        alert('匯出 Excel CSV 報表成功！');
+    }
+
+    function saveAllData() {
+        alert('五大系統資料已成功儲存至 LocalStorage 資料庫！');
+    }
+
+    // 初始化啟動
+    initYearMonthSelectors();
+    renderMatrixTable();
+    renderBpmTable();
+    renderDocTable();
+</script>
+
+</body>
+</html>
