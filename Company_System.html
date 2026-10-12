@@ -241,7 +241,7 @@
             border: 1px solid;
             border-color: var(--win-border-dark) var(--win-border-light) var(--win-border-light) var(--win-border-dark);
             background: #fff;
-            max-height: 62vh;
+            max-height: 55vh;
         }
 
         .erp-table {
@@ -500,22 +500,42 @@
             </div>
         </div>
 
-        <!-- 系統 4：EIP / OA -->
+        <!-- 系統 4：EIP / OA (含動態新增公告) -->
         <div id="sys-3" class="tab-content">
             <div class="group-box">
-                <div class="group-title">EIP 企業資訊入口 - 公司最新公告</div>
-                <div style="background:#fff; padding:10px; border:1px solid var(--win-border-dark);">
-                    <ul style="margin:0; padding-left:20px; line-height:1.8;">
-                        <li><b>【行政公告】</b> 2026 年 10 月份員工考勤排班表已發佈，請同仁核對。</li>
-                        <li><b>【系統升級】</b> 鼎新 e-Go ERP 5.0 五大核心模組即日起上線運作。</li>
-                        <li><b>【財務提醒】</b> 9 月份差旅費用請款請於本週五前送交簽核。</li>
+                <div class="group-title">EIP 企業入口 - 發布新公告</div>
+                <div class="form-grid">
+                    <div class="form-row">
+                        <label>公告分類：</label>
+                        <select id="ann-category">
+                            <option value="【行政公告】">【行政公告】</option>
+                            <option value="【系統升級】">【系統升級】</option>
+                            <option value="【財務提醒】">【財務提醒】</option>
+                            <option value="【活動通知】">【活動通知】</option>
+                        </select>
+                    </div>
+                    <div class="form-row" style="flex: 2;">
+                        <label>公告內容：</label>
+                        <input type="text" id="ann-content" placeholder="請輸入公告內文...">
+                    </div>
+                    <div class="form-row">
+                        <button class="btn-win" onclick="addAnnouncement()" style="background-color: #d1fae5;">📢 發布公告</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="group-box">
+                <div class="group-title">公司最新公告清單 (可即時新增與刪除)</div>
+                <div style="background:#fff; padding:8px; border:1px solid var(--win-border-dark); max-height: 200px; overflow-y: auto;">
+                    <ul id="announcement-list" style="margin:0; padding-left:20px; line-height:1.8;">
+                        <!-- 動態產生 -->
                     </ul>
                 </div>
             </div>
 
             <div class="group-box">
                 <div class="group-title">個人今日待辦事項與工作協作 (OA)</div>
-                <div class="table-container">
+                <div class="table-container" style="max-height: 180px;">
                     <table class="erp-table">
                         <thead>
                             <tr>
@@ -586,7 +606,7 @@
 
         <!-- 底部狀態列 -->
         <div class="statusbar">
-            <span id="status-msg">系統狀態：就緒 | 鼎新 e-Go ERP 5.0 上下滿版旗艦介面</span>
+            <span id="status-msg">系統狀態：就緒 | 支援 EIP 公告動態發布與管理</span>
             <span id="record-count">總筆數：就緒</span>
         </div>
     </div>
@@ -624,6 +644,51 @@
         });
     }
 
+    // --- EIP 公告邏輯 ---
+    function getAnnouncements() {
+        const data = localStorage.getItem('ego_v5_announcements');
+        return data ? JSON.parse(data) : [
+            { category: '【行政公告】', text: '2026 年 10 月份員工考勤排班表已發佈，請同仁核對。' },
+            { category: '【系統升級】', text: '鼎新 e-Go ERP 5.0 五大核心模組即日起上線運作。' },
+            { category: '【財務提醒】', text: '9 月份差旅費用請款請於本週五前送交簽核。' }
+        ];
+    }
+
+    function renderAnnouncements() {
+        const listEl = document.getElementById('announcement-list');
+        listEl.innerHTML = '';
+        const anns = getAnnouncements();
+
+        anns.forEach((ann, idx) => {
+            let li = document.createElement('li');
+            li.style.margin = '4px 0';
+            li.innerHTML = `<b>${ann.category}</b> ${ann.text} <button onclick="deleteAnnouncement(${idx})" style="color:red; font-size:10px; margin-left:10px; cursor:pointer;">[刪除]</button>`;
+            listEl.appendChild(li);
+        });
+    }
+
+    function addAnnouncement() {
+        let category = document.getElementById('ann-category').value;
+        let text = document.getElementById('ann-content').value.trim();
+        if (!text) { alert('請輸入公告內容！'); return; }
+
+        let anns = getAnnouncements();
+        anns.unshift({ category, text }); // 新增到最上方
+        localStorage.setItem('ego_v5_announcements', JSON.stringify(anns));
+        renderAnnouncements();
+        document.getElementById('ann-content').value = '';
+        alert('公告發布成功！');
+    }
+
+    function deleteAnnouncement(idx) {
+        if (!confirm('確定要刪除這則公告嗎？')) return;
+        let anns = getAnnouncements();
+        anns.splice(idx, 1);
+        localStorage.setItem('ego_v5_announcements', JSON.stringify(anns));
+        renderAnnouncements();
+    }
+
+    // --- HRM 邏輯 ---
     function getEmployees() {
         const data = localStorage.getItem('ego_v5_emps');
         return data ? JSON.parse(data) : [
@@ -799,6 +864,7 @@
         alert('📅 已套用週休二日範本！');
     }
 
+    // --- BPM 簽核邏輯 ---
     function getBpmForms() {
         const data = localStorage.getItem('ego_v5_bpm');
         return data ? JSON.parse(data) : [
@@ -848,6 +914,7 @@
         renderBpmTable();
     }
 
+    // --- ISO 文件邏輯 ---
     function getDocs() {
         const data = localStorage.getItem('ego_v5_docs');
         return data ? JSON.parse(data) : [
@@ -908,6 +975,7 @@
     renderMatrixTable();
     renderBpmTable();
     renderDocTable();
+    renderAnnouncements();
 </script>
 
 </body>
