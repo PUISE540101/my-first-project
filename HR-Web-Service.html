@@ -1,0 +1,711 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HR web service</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: "Microsoft JhengHei", "PingFang TC", "Noto Sans TC", "Segoe UI", sans-serif;
+      background: #f5f7fa;
+      min-height: 100vh;
+      color: #333;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ========== 頂部導覽 ========== */
+    .navbar {
+      background: #1e2a38;
+      height: 52px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 28px;
+      color: #fff;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .nav-left {
+      display: flex;
+      align-items: center;
+      gap: 32px;
+    }
+
+    .logo {
+      width: 28px;
+      height: 28px;
+      background: #fff;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      color: #1e2a38;
+      font-weight: 700;
+      letter-spacing: -1px;
+    }
+
+    .nav-item {
+      color: #b0bec5;
+      text-decoration: none;
+      font-size: 15px;
+      padding: 6px 2px;
+      position: relative;
+      cursor: pointer;
+      transition: color 0.2s;
+      background: none;
+      border: none;
+      font-family: inherit;
+    }
+
+    .nav-item:hover { color: #fff; }
+
+    .nav-item.active {
+      color: #fff;
+      font-weight: 500;
+    }
+
+    .nav-item.active::after {
+      content: '';
+      position: absolute;
+      bottom: -15px;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: #3498db;
+      border-radius: 2px 2px 0 0;
+    }
+
+    .nav-right {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .flag {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: 700;
+      color: #fff;
+      cursor: pointer;
+      transition: transform 0.15s;
+      user-select: none;
+    }
+    .flag:hover { transform: scale(1.1); }
+    .flag.tw { background: #e74c3c; }
+    .flag.th { background: #e67e22; }
+    .flag.id { background: #c0392b; }
+
+    /* ========== 主內容區 ========== */
+    .page {
+      display: none;
+      flex: 1;
+      position: relative;
+      overflow: hidden;
+    }
+    .page.active { display: flex; flex-direction: column; }
+
+    /* 背景裝飾（波浪 + 平板） */
+    .bg-decor {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      overflow: hidden;
+      z-index: 0;
+    }
+
+    .bg-wave {
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 80% 60% at 20% 30%, rgba(52,152,219,0.04) 0%, transparent 60%),
+        radial-gradient(ellipse 70% 50% at 80% 70%, rgba(52,152,219,0.03) 0%, transparent 55%);
+    }
+
+    .bg-wave::before {
+      content: '';
+      position: absolute;
+      width: 140%;
+      height: 140%;
+      top: -20%;
+      left: -20%;
+      background: repeating-radial-gradient(
+        circle at 50% 50%,
+        transparent 0,
+        transparent 40px,
+        rgba(100,140,180,0.03) 41px,
+        rgba(100,140,180,0.03) 42px
+      );
+      transform: rotate(-8deg);
+    }
+
+    .tablet-left, .tablet-right {
+      position: absolute;
+      width: 180px;
+      height: 260px;
+      background: linear-gradient(145deg, #d0d5dd 0%, #a0a8b4 100%);
+      border-radius: 18px;
+      opacity: 0.18;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.08);
+    }
+    .tablet-left {
+      top: 40px;
+      left: -40px;
+      transform: rotate(-25deg);
+    }
+    .tablet-right {
+      bottom: 60px;
+      right: -30px;
+      transform: rotate(18deg);
+      width: 160px;
+      height: 230px;
+    }
+
+    /* ========== 首頁 ========== */
+    .home-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      z-index: 1;
+      padding: 40px 20px;
+      text-align: center;
+    }
+
+    .home-title {
+      font-size: 42px;
+      font-weight: 600;
+      color: #2c3e50;
+      letter-spacing: 1px;
+      margin-bottom: 12px;
+    }
+
+    .home-subtitle {
+      font-size: 18px;
+      color: #7f8c8d;
+      font-weight: 400;
+    }
+
+    /* ========== 表單共用 ========== */
+    .form-wrapper {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      padding: 48px 24px 40px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .form-title {
+      font-size: 26px;
+      font-weight: 600;
+      color: #2c3e50;
+      margin-bottom: 36px;
+      letter-spacing: 3px;
+      text-align: center;
+    }
+
+    .form-card {
+      width: 100%;
+      max-width: 860px;
+      background: transparent;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px 48px;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    label {
+      font-size: 13.5px;
+      color: #555;
+      font-weight: 500;
+    }
+
+    input[type="text"],
+    input[type="password"],
+    input[type="datetime-local"],
+    input[type="date"],
+    select {
+      height: 38px;
+      padding: 0 12px;
+      border: 1px solid #c8cdd5;
+      border-radius: 5px;
+      font-size: 14px;
+      font-family: inherit;
+      color: #333;
+      background: #fff;
+      transition: border-color 0.2s, box-shadow 0.2s;
+      outline: none;
+      width: 100%;
+    }
+
+    input:focus, select:focus {
+      border-color: #3498db;
+      box-shadow: 0 0 0 3px rgba(52,152,219,0.18);
+    }
+
+    input:disabled, select:disabled {
+      background: #eef0f3;
+      color: #999;
+      cursor: not-allowed;
+    }
+
+    /* 密碼眼睛 */
+    .password-wrap { position: relative; }
+    .password-wrap input { padding-right: 40px; }
+    .toggle-eye {
+      position: absolute;
+      right: 8px;
+      top: 50%;
+      transform: translateY(-50%);
+      cursor: pointer;
+      background: none;
+      border: none;
+      font-size: 16px;
+      color: #888;
+      padding: 4px;
+      line-height: 1;
+    }
+    .toggle-eye:hover { color: #555; }
+
+    /* 工號藍色邊框 */
+    .emp-id-focus {
+      border-color: #3498db !important;
+      box-shadow: 0 0 0 2px rgba(52,152,219,0.25);
+    }
+
+    /* 日期 icon */
+    .date-wrap { position: relative; }
+    .date-wrap input { padding-right: 36px; }
+    .date-icon {
+      position: absolute;
+      right: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #999;
+      pointer-events: none;
+      font-size: 15px;
+    }
+
+    /* 按鈕 */
+    .btn-row {
+      display: flex;
+      gap: 12px;
+      margin-top: 32px;
+      justify-content: flex-start;
+    }
+
+    .btn-row.center { justify-content: center; }
+
+    .btn {
+      min-width: 100px;
+      height: 38px;
+      border: none;
+      border-radius: 5px;
+      font-size: 14.5px;
+      font-family: inherit;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.1s;
+      color: #fff;
+    }
+    .btn:active { transform: scale(0.97); }
+
+    .btn-blue {
+      background: #2b7de9;
+      box-shadow: 0 2px 6px rgba(43,125,233,0.3);
+    }
+    .btn-blue:hover { background: #1a6ad4; }
+
+    .btn-light-blue {
+      background: #4a9ef5;
+      box-shadow: 0 2px 6px rgba(74,158,245,0.3);
+    }
+    .btn-light-blue:hover { background: #2b7de9; }
+
+    /* 申請紀錄按鈕（未刷單） */
+    .btn-record {
+      position: absolute;
+      top: 48px;
+      left: 24px;
+      min-width: 110px;
+      z-index: 2;
+    }
+
+    /* ========== 頁尾 ========== */
+    .footer {
+      text-align: center;
+      padding: 20px;
+      font-size: 12px;
+      color: #95a5a6;
+      position: relative;
+      z-index: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+    .footer .logo-small {
+      width: 16px;
+      height: 16px;
+      background: #95a5a6;
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 8px;
+      color: #fff;
+      font-weight: 700;
+    }
+
+    /* 主題切換 */
+    .theme-toggle {
+      position: fixed;
+      bottom: 18px;
+      right: 18px;
+      background: #6c5ce7;
+      color: #fff;
+      border: none;
+      border-radius: 18px;
+      padding: 7px 14px;
+      font-size: 12.5px;
+      cursor: pointer;
+      box-shadow: 0 3px 10px rgba(108,92,231,0.4);
+      font-family: inherit;
+      z-index: 200;
+      transition: background 0.2s;
+    }
+    .theme-toggle:hover { background: #5b4cdb; }
+
+    /* ========== 深色模式 ========== */
+    body.dark { background: #0f172a; color: #e2e8f0; }
+    body.dark .navbar { background: #0b1120; }
+    body.dark .home-title { color: #e2e8f0; }
+    body.dark .home-subtitle { color: #94a3b8; }
+    body.dark .form-title { color: #e2e8f0; }
+    body.dark label { color: #94a3b8; }
+    body.dark input, body.dark select {
+      background: #1e293b;
+      border-color: #334155;
+      color: #e2e8f0;
+    }
+    body.dark input:disabled, body.dark select:disabled {
+      background: #0f172a;
+      color: #64748b;
+    }
+    body.dark input:focus, body.dark select:focus {
+      border-color: #38bdf8;
+      box-shadow: 0 0 0 3px rgba(56,189,248,0.2);
+    }
+    body.dark .footer { color: #64748b; }
+    body.dark .footer .logo-small { background: #64748b; }
+    body.dark .tablet-left, body.dark .tablet-right { opacity: 0.08; }
+
+    /* 響應式 */
+    @media (max-width: 720px) {
+      .form-grid { grid-template-columns: 1fr; gap: 16px; }
+      .home-title { font-size: 32px; }
+      .btn-record { position: static; margin-bottom: 16px; }
+      .form-wrapper { padding-top: 28px; }
+      .tablet-left, .tablet-right { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 導覽列 -->
+  <nav class="navbar">
+    <div class="nav-left">
+      <div class="logo">S</div>
+      <button class="nav-item active" data-page="home" onclick="showPage('home')">首頁</button>
+      <button class="nav-item" data-page="leave" onclick="showPage('leave')">請假單</button>
+      <button class="nav-item" data-page="missed" onclick="showPage('missed')">未刷單</button>
+    </div>
+    <div class="nav-right">
+      <div class="flag tw">TW</div>
+      <div class="flag th">TH</div>
+      <div class="flag id">ID</div>
+    </div>
+  </nav>
+
+  <!-- ========== 首頁 ========== -->
+  <div class="page active" id="page-home">
+    <div class="bg-decor">
+      <div class="bg-wave"></div>
+      <div class="tablet-left"></div>
+      <div class="tablet-right"></div>
+    </div>
+    <div class="home-content">
+      <h1 class="home-title">HR web service</h1>
+      <p class="home-subtitle">Designed for IT</p>
+    </div>
+    <div class="footer">
+      <span class="logo-small">S</span>
+      © APEX DYNAMICS 2026
+    </div>
+  </div>
+
+  <!-- ========== 請假單 ========== -->
+  <div class="page" id="page-leave">
+    <div class="bg-decor">
+      <div class="bg-wave"></div>
+      <div class="tablet-left"></div>
+      <div class="tablet-right"></div>
+    </div>
+    <div class="form-wrapper">
+      <h2 class="form-title">請假單</h2>
+      <div class="form-card">
+        <form onsubmit="return submitLeave(event)">
+          <div class="form-grid">
+            <!-- 身分證後四碼 -->
+            <div class="form-group">
+              <label>身分證號後四碼</label>
+              <div class="password-wrap">
+                <input type="password" id="leave-id4" value="••••" maxlength="4" placeholder="請輸入後四碼">
+                <button type="button" class="toggle-eye" onclick="togglePw('leave-id4')" title="顯示/隱藏">👁</button>
+              </div>
+            </div>
+            <div class="form-group"></div>
+
+            <!-- 工號 / 部門 -->
+            <div class="form-group">
+              <label>工號</label>
+              <input type="text" id="leave-emp" class="emp-id-focus" value="d01762" placeholder="請輸入工號">
+            </div>
+            <div class="form-group">
+              <label>部門</label>
+              <input type="text" id="leave-dept" disabled>
+            </div>
+
+            <!-- 姓名 / 1級主管 -->
+            <div class="form-group">
+              <label>姓名</label>
+              <input type="text" id="leave-name" disabled>
+            </div>
+            <div class="form-group">
+              <label>1級主管</label>
+              <input type="text" id="leave-s1" disabled>
+            </div>
+
+            <!-- 請假名稱 / 2級主管 -->
+            <div class="form-group">
+              <label>請假名稱</label>
+              <select id="leave-type">
+                <option value="" selected disabled>請選擇...</option>
+                <option value="事假">事假</option>
+                <option value="病假">病假</option>
+                <option value="特休">特休</option>
+                <option value="婚假">婚假</option>
+                <option value="喪假">喪假</option>
+                <option value="產假">產假</option>
+                <option value="陪產假">陪產假</option>
+                <option value="公假">公假</option>
+                <option value="補休">補休</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>2級主管</label>
+              <input type="text" id="leave-s2" disabled>
+            </div>
+
+            <!-- 開始時間 / 未休時數 -->
+            <div class="form-group">
+              <label>開始時間</label>
+              <div class="date-wrap">
+                <input type="datetime-local" id="leave-start" onchange="calcLeaveHours()">
+                <span class="date-icon">📅</span>
+              </div>
+            </div>
+            <div class="form-group">
+              <label>未休時數</label>
+              <input type="text" id="leave-remain" disabled>
+            </div>
+
+            <!-- 結束時間 / 預計請假時數 -->
+            <div class="form-group">
+              <label>結束時間</label>
+              <div class="date-wrap">
+                <input type="datetime-local" id="leave-end" onchange="calcLeaveHours()">
+                <span class="date-icon">📅</span>
+              </div>
+            </div>
+            <div class="form-group">
+              <label>預計請假時數</label>
+              <input type="text" id="leave-hours" readonly>
+            </div>
+          </div>
+
+          <div class="btn-row center">
+            <button type="button" class="btn btn-blue" onclick="queryLeave()">查詢</button>
+            <button type="submit" class="btn btn-light-blue">送出</button>
+          </div>
+        </form>
+      </div>
+    </div>
+    <div class="footer">
+      <span class="logo-small">S</span>
+      © APEX DYNAMICS 2026
+    </div>
+  </div>
+
+  <!-- ========== 未刷單 ========== -->
+  <div class="page" id="page-missed">
+    <div class="bg-decor">
+      <div class="bg-wave"></div>
+      <div class="tablet-left"></div>
+      <div class="tablet-right"></div>
+    </div>
+    <div class="form-wrapper" style="position:relative;">
+      <button class="btn btn-blue btn-record" onclick="alert('申請紀錄功能（示範）')">申請紀錄</button>
+      <h2 class="form-title">未刷單</h2>
+      <div class="form-card">
+        <form onsubmit="return submitMissed(event)">
+          <div class="form-grid">
+            <!-- 工號 / 身分證後四碼 -->
+            <div class="form-group">
+              <label>工號</label>
+              <input type="text" id="miss-emp" placeholder="">
+            </div>
+            <div class="form-group">
+              <label>身分證號後四碼</label>
+              <div class="password-wrap">
+                <input type="password" id="miss-id4" maxlength="4" placeholder="">
+                <button type="button" class="toggle-eye" onclick="togglePw('miss-id4')" title="顯示/隱藏">👁</button>
+              </div>
+            </div>
+
+            <!-- 未刷卡原因 / 未刷卡時間 -->
+            <div class="form-group">
+              <label>未刷卡原因</label>
+              <select id="miss-reason">
+                <option value="未帶卡" selected>未帶卡</option>
+                <option value="忘記刷卡">忘記刷卡</option>
+                <option value="系統異常">系統異常</option>
+                <option value="機器故障">機器故障</option>
+                <option value="其他">其他</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>未刷卡時間</label>
+              <div class="date-wrap">
+                <input type="datetime-local" id="miss-time">
+                <span class="date-icon">📅</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="btn-row">
+            <button type="submit" class="btn btn-blue">送出</button>
+          </div>
+        </form>
+      </div>
+    </div>
+    <div class="footer">
+      <span class="logo-small">S</span>
+      © APEX DYNAMICS 2026
+    </div>
+  </div>
+
+  <button class="theme-toggle" onclick="toggleTheme()">Toggle theme</button>
+
+  <script>
+    // 頁面切換
+    function showPage(name) {
+      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+      document.getElementById('page-' + name).classList.add('active');
+
+      document.querySelectorAll('.nav-item').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.page === name);
+      });
+    }
+
+    // 密碼顯示切換
+    function togglePw(id) {
+      const el = document.getElementById(id);
+      if (el.type === 'password') {
+        el.type = 'text';
+        if (el.value === '••••') el.value = '';
+      } else {
+        el.type = 'password';
+      }
+    }
+
+    // 請假單 - 查詢
+    function queryLeave() {
+      const emp = document.getElementById('leave-emp').value.trim();
+      if (!emp) {
+        alert('請先輸入工號');
+        return;
+      }
+      document.getElementById('leave-dept').value = '資訊部';
+      document.getElementById('leave-name').value = '王小明';
+      document.getElementById('leave-s1').value = '李主管';
+      document.getElementById('leave-s2').value = '陳經理';
+      document.getElementById('leave-remain').value = '40';
+      alert('查詢成功！已帶出員工資料。');
+    }
+
+    // 請假單 - 計算時數
+    function calcLeaveHours() {
+      const s = document.getElementById('leave-start').value;
+      const e = document.getElementById('leave-end').value;
+      if (s && e) {
+        const hours = (new Date(e) - new Date(s)) / 3600000;
+        document.getElementById('leave-hours').value = hours > 0 ? hours.toFixed(1) : '';
+      }
+    }
+
+    // 請假單 - 送出
+    function submitLeave(e) {
+      e.preventDefault();
+      const type = document.getElementById('leave-type').value;
+      const start = document.getElementById('leave-start').value;
+      const end = document.getElementById('leave-end').value;
+      if (!type) { alert('請選擇請假名稱'); return false; }
+      if (!start || !end) { alert('請填寫開始與結束時間'); return false; }
+      alert('請假單已送出！\n\n請假類型：' + type + '\n開始：' + start + '\n結束：' + end);
+      return false;
+    }
+
+    // 未刷單 - 送出
+    function submitMissed(e) {
+      e.preventDefault();
+      const emp = document.getElementById('miss-emp').value.trim();
+      const reason = document.getElementById('miss-reason').value;
+      const time = document.getElementById('miss-time').value;
+      if (!emp) { alert('請輸入工號'); return false; }
+      if (!time) { alert('請選擇未刷卡時間'); return false; }
+      alert('未刷單已送出！\n\n工號：' + emp + '\n原因：' + reason + '\n時間：' + time);
+      return false;
+    }
+
+    // 主題切換
+    function toggleTheme() {
+      document.body.classList.toggle('dark');
+    }
+  </script>
+</body>
+</html>
