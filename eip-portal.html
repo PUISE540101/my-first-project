@@ -24,7 +24,6 @@
       background: var(--bg); color: var(--text); font-size: 13px; line-height: 1.4; min-height: 100vh;
     }
 
-    /* Top bar */
     .topbar {
       height: var(--header-h);
       background: linear-gradient(to bottom, #0055a4 0%, #003366 100%);
@@ -43,10 +42,8 @@
     }
     .menu-btn { display: none; background: none; border: none; color: #fff; font-size: 18px; cursor: pointer; padding: 2px 6px; }
 
-    /* Layout */
     .wrap { display: flex; margin-top: var(--header-h); min-height: calc(100vh - var(--header-h)); }
 
-    /* Sidebar */
     .sidebar {
       width: var(--sidebar-w); background: #eef3f8; border-right: 1px solid var(--border);
       position: fixed; top: var(--header-h); left: 0; bottom: 0; overflow-y: auto; z-index: 200;
@@ -65,12 +62,11 @@
     }
     .side-group { font-size: 11px; color: #78909c; padding: 8px 12px 2px; font-weight: 600; }
 
-    /* Main */
     .main { flex: 1; margin-left: var(--sidebar-w); padding: 10px 12px 16px; }
     .crumb { font-size: 12px; color: var(--secondary); margin-bottom: 8px; }
     .crumb b { color: var(--primary); }
+    .crumb a { color: #0066b3; cursor: pointer; text-decoration: none; }
 
-    /* Stats */
     .stat-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 10px; }
     .stat-box {
       background: #fff; border: 1px solid var(--border); padding: 10px 12px;
@@ -79,16 +75,17 @@
     .stat-box .num { font-size: 22px; font-weight: 700; color: var(--primary); line-height: 1; }
     .stat-box .lbl { font-size: 12px; color: var(--secondary); }
 
-    /* Panels */
     .panel-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; }
-    .panel { background: #fff; border: 1px solid var(--border); }
+    .panel { background: #fff; border: 1px solid var(--border); margin-bottom: 10px; }
     .panel-hd {
       background: #e4ecf5; border-bottom: 1px solid var(--border); padding: 6px 10px;
       font-size: 13px; font-weight: 700; color: var(--primary);
       display: flex; justify-content: space-between; align-items: center;
     }
-    .panel-hd a { font-size: 12px; color: var(--accent); font-weight: 400; text-decoration: none; cursor: pointer; }
-    .panel-hd a:hover { text-decoration: underline; }
+    .panel-hd a, .panel-hd .link {
+      font-size: 12px; color: var(--accent); font-weight: 400; text-decoration: none; cursor: pointer;
+    }
+    .panel-hd a:hover, .panel-hd .link:hover { text-decoration: underline; }
     .panel-bd { padding: 0; }
 
     .row {
@@ -126,7 +123,6 @@
     .sys-btn .c { font-weight: 700; color: var(--primary); font-size: 13px; }
     .sys-btn .n { font-size: 11px; color: var(--secondary); }
 
-    /* Tables */
     .page { display: none; }
     .page.on { display: block; }
     table.grid { width: 100%; border-collapse: collapse; background: #fff; border: 1px solid var(--border); }
@@ -137,20 +133,67 @@
     table.grid td { border: 1px solid var(--border-light); padding: 6px 8px; font-size: 13px; }
     table.grid tr:hover td { background: #f0f6fc; }
 
-    /* System page cards */
     .func-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 12px; }
     .func-card {
-      border: 1px solid #c0cdd8; padding: 14px; text-align: center; cursor: pointer; background: #f8fafc;
+      border: 1px solid #c0cdd8; padding: 14px 10px; text-align: center; cursor: pointer;
+      background: #f8fafc; position: relative;
     }
     .func-card:hover { background: #e3f2fd; border-color: #90caf9; }
     .func-card .t { font-weight: 700; color: #003366; margin-bottom: 4px; }
     .func-card .d { font-size: 12px; color: #666; }
+    .func-card .ops {
+      position: absolute; top: 4px; right: 4px; display: none; gap: 2px;
+    }
+    .func-card:hover .ops { display: flex; }
+    .func-card .ops button {
+      border: none; background: #fff; border: 1px solid #c0cdd8; font-size: 11px;
+      padding: 1px 5px; cursor: pointer; color: #555;
+    }
+    .func-card .ops button:hover { background: #e3f2fd; color: #003366; }
+    .func-card .ops .del:hover { background: #fce4ec; color: #c62828; }
+
+    .add-card {
+      border: 1px dashed #90a4ae; padding: 14px; text-align: center; cursor: pointer;
+      background: #fafbfc; color: #546e7a; font-size: 13px;
+    }
+    .add-card:hover { background: #e8f5e9; border-color: #66bb6a; color: #2e7d32; }
 
     .st { font-size: 11px; padding: 1px 5px; font-weight: 600; }
     .st-w { background: #fff8e1; color: #f57f17; }
     .st-d { background: #e8f5e9; color: #2e7d32; }
 
-    /* Mobile */
+    /* Modal */
+    .modal-mask {
+      display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.4);
+      z-index: 500; align-items: center; justify-content: center;
+    }
+    .modal-mask.show { display: flex; }
+    .modal {
+      background: #fff; border: 1px solid #a0b4c8; width: 90%; max-width: 380px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+    }
+    .modal-hd {
+      background: #e4ecf5; border-bottom: 1px solid #a0b4c8; padding: 10px 14px;
+      font-weight: 700; color: #003366; font-size: 14px;
+    }
+    .modal-bd { padding: 14px; }
+    .modal-bd label { display: block; font-size: 12px; color: #555; margin-bottom: 4px; }
+    .modal-bd input {
+      width: 100%; padding: 7px 10px; border: 1px solid #a0b4c8; font-size: 13px;
+      font-family: inherit; margin-bottom: 12px;
+    }
+    .modal-bd input:focus { outline: none; border-color: #0066b3; }
+    .modal-ft {
+      padding: 10px 14px; border-top: 1px solid #d0dce8; display: flex; justify-content: flex-end; gap: 8px;
+    }
+    .btn {
+      padding: 6px 14px; border: 1px solid #a0b4c8; background: #f5f8fb;
+      font-size: 13px; cursor: pointer; font-family: inherit;
+    }
+    .btn-primary { background: #003366; color: #fff; border-color: #003366; }
+    .btn-primary:hover { background: #004080; }
+    .btn:hover { background: #e3f2fd; }
+
     @media (max-width: 860px) {
       .sidebar { transform: translateX(-100%); transition: 0.2s; }
       .sidebar.open { transform: translateX(0); }
@@ -205,7 +248,7 @@
 
   <div class="main">
 
-    <!-- ===== 首頁 ===== -->
+    <!-- 首頁 -->
     <div class="page on" id="p-home">
       <div class="crumb"><b>PowerEIP</b> 〉 首頁總覽</div>
       <div class="stat-row">
@@ -253,7 +296,7 @@
       </div>
     </div>
 
-    <!-- ===== 公告 ===== -->
+    <!-- 公告 -->
     <div class="page" id="p-announce">
       <div class="crumb"><b>PowerEIP</b> 〉 公告管理</div>
       <table class="grid">
@@ -266,7 +309,7 @@
       </table>
     </div>
 
-    <!-- ===== 待辦 ===== -->
+    <!-- 待辦 -->
     <div class="page" id="p-todo">
       <div class="crumb"><b>PowerEIP</b> 〉 我的待辦</div>
       <table class="grid">
@@ -279,7 +322,7 @@
       </table>
     </div>
 
-    <!-- ===== 行事曆 ===== -->
+    <!-- 行事曆 -->
     <div class="page" id="p-calendar">
       <div class="crumb"><b>PowerEIP</b> 〉 行事曆</div>
       <table class="grid">
@@ -292,7 +335,7 @@
       </table>
     </div>
 
-    <!-- ===== 文件 ===== -->
+    <!-- 文件 -->
     <div class="page" id="p-docs">
       <div class="crumb"><b>PowerEIP</b> 〉 文件中心</div>
       <table class="grid">
@@ -305,7 +348,7 @@
       </table>
     </div>
 
-    <!-- ===== 系統入口 ===== -->
+    <!-- 系統入口 -->
     <div class="page" id="p-systems">
       <div class="crumb"><b>PowerEIP</b> 〉 系統入口</div>
       <table class="grid">
@@ -319,44 +362,34 @@
       </table>
     </div>
 
-    <!-- ===== HRM ===== -->
+    <!-- HRM -->
     <div class="page" id="p-hrm">
-      <div class="crumb"><b>PowerHRM</b> 〉 人資系統　<a onclick="go('home')" style="color:#0066b3;cursor:pointer;">← 返回入口</a></div>
-      <div class="panel" style="margin-bottom:10px;">
-        <div class="panel-hd">功能選單</div>
-        <div class="func-grid">
-          <div class="func-card"><div class="t">人事資料</div><div class="d">員工基本資料維護</div></div>
-          <div class="func-card"><div class="t">差勤管理</div><div class="d">上下班、加班、請假</div></div>
-          <div class="func-card"><div class="t">請假申請</div><div class="d">年假、病假、事假</div></div>
-          <div class="func-card"><div class="t">薪資計算</div><div class="d">薪資結構、發薪作業</div></div>
-          <div class="func-card"><div class="t">考核評核</div><div class="d">績效考核作業</div></div>
-          <div class="func-card"><div class="t">組織架構</div><div class="d">部門、職級設定</div></div>
+      <div class="crumb"><b>PowerHRM</b> 〉 人資系統　<a onclick="go('home')">← 返回入口</a></div>
+      <div class="panel">
+        <div class="panel-hd">
+          功能選單
+          <span class="link" onclick="openModal('hrm')">＋ 新增</span>
         </div>
+        <div class="func-grid" id="menu-hrm"></div>
       </div>
       <div class="panel">
-        <div class="panel-hd">近期差勤摘要</div>
-        <table class="grid">
-          <tr><th>員工</th><th>類型</th><th>日期</th><th>狀態</th></tr>
-          <tr><td>王小明</td><td>年假</td><td>2026/10/20</td><td>已核准</td></tr>
-          <tr><td>陳美玲</td><td>病假</td><td>2026/10/15</td><td>審核中</td></tr>
-          <tr><td>林志豪</td><td>加班</td><td>2026/10/12</td><td>已核准</td></tr>
-        </table>
+        <div class="panel-hd">
+          近期差勤摘要
+          <span class="link" onclick="openAttModal()">＋ 新增</span>
+        </div>
+        <div id="attTableWrap"></div>
       </div>
     </div>
 
-    <!-- ===== BPM ===== -->
+    <!-- BPM -->
     <div class="page" id="p-bpm">
-      <div class="crumb"><b>PowerBPM</b> 〉 流程管理　<a onclick="go('home')" style="color:#0066b3;cursor:pointer;">← 返回入口</a></div>
-      <div class="panel" style="margin-bottom:10px;">
-        <div class="panel-hd">功能選單</div>
-        <div class="func-grid">
-          <div class="func-card"><div class="t">待簽核</div><div class="d">需我處理的表單</div></div>
-          <div class="func-card"><div class="t">我的申請</div><div class="d">我發起的流程</div></div>
-          <div class="func-card"><div class="t">流程追蹤</div><div class="d">查看進度狀態</div></div>
-          <div class="func-card"><div class="t">表單設計</div><div class="d">自訂簽核表單</div></div>
-          <div class="func-card"><div class="t">流程設定</div><div class="d">簽核路徑維護</div></div>
-          <div class="func-card"><div class="t">統計報表</div><div class="d">簽核效率分析</div></div>
+      <div class="crumb"><b>PowerBPM</b> 〉 流程管理　<a onclick="go('home')">← 返回入口</a></div>
+      <div class="panel">
+        <div class="panel-hd">
+          功能選單
+          <span class="link" onclick="openModal('bpm')">＋ 新增</span>
         </div>
+        <div class="func-grid" id="menu-bpm"></div>
       </div>
       <div class="panel">
         <div class="panel-hd">待我簽核</div>
@@ -369,19 +402,15 @@
       </div>
     </div>
 
-    <!-- ===== ERP ===== -->
+    <!-- ERP -->
     <div class="page" id="p-erp">
-      <div class="crumb"><b>PowerERP</b> 〉 營運管理　<a onclick="go('home')" style="color:#0066b3;cursor:pointer;">← 返回入口</a></div>
-      <div class="panel" style="margin-bottom:10px;">
-        <div class="panel-hd">功能模組</div>
-        <div class="func-grid">
-          <div class="func-card"><div class="t">銷售管理</div><div class="d">報價、訂單、出貨</div></div>
-          <div class="func-card"><div class="t">採購管理</div><div class="d">請購、採購、進貨</div></div>
-          <div class="func-card"><div class="t">庫存管理</div><div class="d">入庫、出庫、盤點</div></div>
-          <div class="func-card"><div class="t">生產管理</div><div class="d">製令、MRP、完工</div></div>
-          <div class="func-card"><div class="t">財務會計</div><div class="d">傳票、應收應付</div></div>
-          <div class="func-card"><div class="t">報表中心</div><div class="d">營運分析報表</div></div>
+      <div class="crumb"><b>PowerERP</b> 〉 營運管理　<a onclick="go('home')">← 返回入口</a></div>
+      <div class="panel">
+        <div class="panel-hd">
+          功能選單
+          <span class="link" onclick="openModal('erp')">＋ 新增</span>
         </div>
+        <div class="func-grid" id="menu-erp"></div>
       </div>
       <div class="panel">
         <div class="panel-hd">今日營運摘要</div>
@@ -394,19 +423,15 @@
       </div>
     </div>
 
-    <!-- ===== ISO ===== -->
+    <!-- ISO -->
     <div class="page" id="p-iso">
-      <div class="crumb"><b>PowerISO</b> 〉 文件與制度　<a onclick="go('home')" style="color:#0066b3;cursor:pointer;">← 返回入口</a></div>
-      <div class="panel" style="margin-bottom:10px;">
-        <div class="panel-hd">功能選單</div>
-        <div class="func-grid">
-          <div class="func-card"><div class="t">文件管理</div><div class="d">上傳、版本控制</div></div>
-          <div class="func-card"><div class="t">制度規章</div><div class="d">公司制度文件</div></div>
-          <div class="func-card"><div class="t">審核流程</div><div class="d">文件審核簽核</div></div>
-          <div class="func-card"><div class="t">權限設定</div><div class="d">閱讀與下載權限</div></div>
-          <div class="func-card"><div class="t">稽核軌跡</div><div class="d">操作紀錄查詢</div></div>
-          <div class="func-card"><div class="t">發行通知</div><div class="d">新版文件公告</div></div>
+      <div class="crumb"><b>PowerISO</b> 〉 文件與制度　<a onclick="go('home')">← 返回入口</a></div>
+      <div class="panel">
+        <div class="panel-hd">
+          功能選單
+          <span class="link" onclick="openModal('iso')">＋ 新增</span>
         </div>
+        <div class="func-grid" id="menu-iso"></div>
       </div>
       <div class="panel">
         <div class="panel-hd">最近文件</div>
@@ -422,7 +447,185 @@
   </div>
 </div>
 
+<!-- 功能選單 Modal -->
+<div class="modal-mask" id="modalMask">
+  <div class="modal">
+    <div class="modal-hd" id="modalTitle">新增功能</div>
+    <div class="modal-bd">
+      <label>功能名稱</label>
+      <input type="text" id="fName" placeholder="例如：請假申請" />
+      <label>說明</label>
+      <input type="text" id="fDesc" placeholder="例如：年假、病假、事假" />
+    </div>
+    <div class="modal-ft">
+      <button class="btn" onclick="closeModal()">取消</button>
+      <button class="btn btn-primary" onclick="saveItem()">儲存</button>
+    </div>
+  </div>
+</div>
+
+<!-- 差勤 Modal -->
+<div class="modal-mask" id="attModalMask">
+  <div class="modal">
+    <div class="modal-hd" id="attModalTitle">新增差勤</div>
+    <div class="modal-bd">
+      <label>員工</label>
+      <input type="text" id="attName" placeholder="例如：王小明" />
+      <label>類型</label>
+      <input type="text" id="attType" placeholder="例如：年假、病假、加班" />
+      <label>日期</label>
+      <input type="text" id="attDate" placeholder="例如：2026/10/20" />
+      <label>狀態</label>
+      <select id="attStatus" style="width:100%;padding:7px 10px;border:1px solid #a0b4c8;font-size:13px;font-family:inherit;margin-bottom:12px;">
+        <option value="審核中">審核中</option>
+        <option value="已核准">已核准</option>
+        <option value="已駁回">已駁回</option>
+      </select>
+    </div>
+    <div class="modal-ft">
+      <button class="btn" onclick="closeAttModal()">取消</button>
+      <button class="btn btn-primary" onclick="saveAtt()">儲存</button>
+    </div>
+  </div>
+</div>
+
 <script>
+  const STORAGE_KEY = 'eip_func_menus_v1';
+
+  const defaults = {
+    hrm: [
+      { name: '人事資料', desc: '員工基本資料維護' },
+      { name: '差勤管理', desc: '上下班、加班、請假' },
+      { name: '請假申請', desc: '年假、病假、事假' },
+      { name: '薪資計算', desc: '薪資結構、發薪作業' },
+      { name: '考核評核', desc: '績效考核作業' },
+      { name: '組織架構', desc: '部門、職級設定' }
+    ],
+    bpm: [
+      { name: '待簽核', desc: '需我處理的表單' },
+      { name: '我的申請', desc: '我發起的流程' },
+      { name: '流程追蹤', desc: '查看進度狀態' },
+      { name: '表單設計', desc: '自訂簽核表單' },
+      { name: '流程設定', desc: '簽核路徑維護' },
+      { name: '統計報表', desc: '簽核效率分析' }
+    ],
+    erp: [
+      { name: '銷售管理', desc: '報價、訂單、出貨' },
+      { name: '採購管理', desc: '請購、採購、進貨' },
+      { name: '庫存管理', desc: '入庫、出庫、盤點' },
+      { name: '生產管理', desc: '製令、MRP、完工' },
+      { name: '財務會計', desc: '傳票、應收應付' },
+      { name: '報表中心', desc: '營運分析報表' }
+    ],
+    iso: [
+      { name: '文件管理', desc: '上傳、版本控制' },
+      { name: '制度規章', desc: '公司制度文件' },
+      { name: '審核流程', desc: '文件審核簽核' },
+      { name: '權限設定', desc: '閱讀與下載權限' },
+      { name: '稽核軌跡', desc: '操作紀錄查詢' },
+      { name: '發行通知', desc: '新版文件公告' }
+    ]
+  };
+
+  let menus = {};
+  let editSys = null;
+  let editIdx = null;
+
+  function loadMenus() {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (raw) {
+        menus = JSON.parse(raw);
+      } else {
+        menus = JSON.parse(JSON.stringify(defaults));
+      }
+    } catch (e) {
+      menus = JSON.parse(JSON.stringify(defaults));
+    }
+    // ensure all keys exist
+    ['hrm','bpm','erp','iso'].forEach(k => {
+      if (!menus[k]) menus[k] = JSON.parse(JSON.stringify(defaults[k]));
+    });
+  }
+
+  function saveMenus() {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(menus));
+  }
+
+  function renderMenu(sys) {
+    const el = document.getElementById('menu-' + sys);
+    if (!el) return;
+    const list = menus[sys] || [];
+    el.innerHTML = list.map((item, i) => `
+      <div class="func-card">
+        <div class="ops">
+          <button onclick="event.stopPropagation();openModal('${sys}',${i})">編輯</button>
+          <button class="del" onclick="event.stopPropagation();delItem('${sys}',${i})">刪</button>
+        </div>
+        <div class="t">${esc(item.name)}</div>
+        <div class="d">${esc(item.desc)}</div>
+      </div>
+    `).join('') + `
+      <div class="add-card" onclick="openModal('${sys}')">＋ 新增功能</div>
+    `;
+  }
+
+  function renderAllMenus() {
+    ['hrm','bpm','erp','iso'].forEach(renderMenu);
+  }
+
+  function esc(s) {
+    const d = document.createElement('div');
+    d.textContent = s || '';
+    return d.innerHTML;
+  }
+
+  function openModal(sys, idx) {
+    editSys = sys;
+    editIdx = (typeof idx === 'number') ? idx : null;
+    document.getElementById('modalTitle').textContent = editIdx !== null ? '編輯功能' : '新增功能';
+    if (editIdx !== null) {
+      document.getElementById('fName').value = menus[sys][editIdx].name;
+      document.getElementById('fDesc').value = menus[sys][editIdx].desc;
+    } else {
+      document.getElementById('fName').value = '';
+      document.getElementById('fDesc').value = '';
+    }
+    document.getElementById('modalMask').classList.add('show');
+    document.getElementById('fName').focus();
+  }
+
+  function closeModal() {
+    document.getElementById('modalMask').classList.remove('show');
+    editSys = null;
+    editIdx = null;
+  }
+
+  function saveItem() {
+    const name = document.getElementById('fName').value.trim();
+    const desc = document.getElementById('fDesc').value.trim();
+    if (!name) {
+      alert('請輸入功能名稱');
+      return;
+    }
+    if (!menus[editSys]) menus[editSys] = [];
+    if (editIdx !== null) {
+      menus[editSys][editIdx] = { name, desc };
+    } else {
+      menus[editSys].push({ name, desc });
+    }
+    saveMenus();
+    renderMenu(editSys);
+    closeModal();
+  }
+
+  function delItem(sys, idx) {
+    if (!confirm('確定刪除此功能？')) return;
+    menus[sys].splice(idx, 1);
+    saveMenus();
+    renderMenu(sys);
+  }
+
   const titles = {
     home: 'PowerEIP <small>企業入口與協作平台</small>',
     announce: 'PowerEIP <small>公告管理</small>',
@@ -454,6 +657,136 @@
     document.getElementById('side').classList.remove('open');
     document.getElementById('mask').classList.remove('on');
   }
+
+  // ===== 差勤摘要 =====
+  const ATT_KEY = 'eip_att_records_v1';
+  const attDefaults = [
+    { name: '王小明', type: '年假', date: '2026/10/20', status: '已核准' },
+    { name: '陳美玲', type: '病假', date: '2026/10/15', status: '審核中' },
+    { name: '林志豪', type: '加班', date: '2026/10/12', status: '已核准' }
+  ];
+  let attList = [];
+  let attEditIdx = null;
+
+  function loadAtt() {
+    try {
+      const raw = localStorage.getItem(ATT_KEY);
+      attList = raw ? JSON.parse(raw) : JSON.parse(JSON.stringify(attDefaults));
+    } catch (e) {
+      attList = JSON.parse(JSON.stringify(attDefaults));
+    }
+  }
+  function saveAttList() {
+    localStorage.setItem(ATT_KEY, JSON.stringify(attList));
+  }
+
+  function statusHtml(s) {
+    if (s === '已核准') return '<span class="st st-d">已核准</span>';
+    if (s === '已駁回') return '<span class="st" style="background:#fce4ec;color:#c62828;">已駁回</span>';
+    return '<span class="st st-w">審核中</span>';
+  }
+
+  function renderAtt() {
+    const el = document.getElementById('attTableWrap');
+    if (!el) return;
+    if (!attList.length) {
+      el.innerHTML = '<div style="padding:16px;text-align:center;color:#888;">尚無資料，請點「＋ 新增」</div>';
+      return;
+    }
+    let html = `<table class="grid">
+      <tr>
+        <th>員工</th><th>類型</th><th>日期</th><th>狀態</th>
+        <th style="width:200px">操作</th>
+      </tr>`;
+    attList.forEach((r, i) => {
+      html += `<tr>
+        <td>${esc(r.name)}</td>
+        <td>${esc(r.type)}</td>
+        <td>${esc(r.date)}</td>
+        <td>${statusHtml(r.status)}</td>
+        <td style="white-space:nowrap;">
+          <button class="btn" style="padding:2px 6px;font-size:11px;" onclick="setAttStatus(${i},'審核中')">審核</button>
+          <button class="btn" style="padding:2px 6px;font-size:11px;" onclick="setAttStatus(${i},'已核准')">已核准</button>
+          <button class="btn" style="padding:2px 6px;font-size:11px;" onclick="setAttStatus(${i},'已駁回')">駁回</button>
+          <button class="btn" style="padding:2px 6px;font-size:11px;" onclick="openAttModal(${i})">編輯</button>
+          <button class="btn" style="padding:2px 6px;font-size:11px;color:#c62828;" onclick="delAtt(${i})">刪除</button>
+        </td>
+      </tr>`;
+    });
+    html += '</table>';
+    el.innerHTML = html;
+  }
+
+  function openAttModal(idx) {
+    attEditIdx = (typeof idx === 'number') ? idx : null;
+    document.getElementById('attModalTitle').textContent = attEditIdx !== null ? '編輯差勤' : '新增差勤';
+    if (attEditIdx !== null) {
+      const r = attList[attEditIdx];
+      document.getElementById('attName').value = r.name;
+      document.getElementById('attType').value = r.type;
+      document.getElementById('attDate').value = r.date;
+      document.getElementById('attStatus').value = r.status;
+    } else {
+      document.getElementById('attName').value = '';
+      document.getElementById('attType').value = '';
+      document.getElementById('attDate').value = '';
+      document.getElementById('attStatus').value = '審核中';
+    }
+    document.getElementById('attModalMask').classList.add('show');
+    document.getElementById('attName').focus();
+  }
+
+  function closeAttModal() {
+    document.getElementById('attModalMask').classList.remove('show');
+    attEditIdx = null;
+  }
+
+  function saveAtt() {
+    const name = document.getElementById('attName').value.trim();
+    const type = document.getElementById('attType').value.trim();
+    const date = document.getElementById('attDate').value.trim();
+    const status = document.getElementById('attStatus').value;
+    if (!name || !type || !date) {
+      alert('請填寫員工、類型、日期');
+      return;
+    }
+    const row = { name, type, date, status };
+    if (attEditIdx !== null) {
+      attList[attEditIdx] = row;
+    } else {
+      attList.push(row);
+    }
+    saveAttList();
+    renderAtt();
+    closeAttModal();
+  }
+
+  function setAttStatus(idx, status) {
+    attList[idx].status = status;
+    saveAttList();
+    renderAtt();
+  }
+
+  function delAtt(idx) {
+    if (!confirm('確定刪除此筆差勤？')) return;
+    attList.splice(idx, 1);
+    saveAttList();
+    renderAtt();
+  }
+
+  // init
+  loadMenus();
+  renderAllMenus();
+  loadAtt();
+  renderAtt();
+
+  // ESC close modal
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') {
+      closeModal();
+      closeAttModal();
+    }
+  });
 </script>
 </body>
 </html>
