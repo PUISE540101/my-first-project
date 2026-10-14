@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>PowerEIP - 企業入口平台</title>
+  <title>PowerEIP 企業入口平台</title>
   <style>
     :root {
       --primary: #003366;
@@ -18,237 +18,155 @@
       --header-h: 42px;
       --sidebar-w: 190px;
     }
-
     * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-
     body {
       font-family: "Microsoft JhengHei", "微軟正黑體", "PMingLiU", "新細明體", Arial, sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      font-size: 13px;
-      line-height: 1.4;
-      min-height: 100vh;
+      background: var(--bg); color: var(--text); font-size: 13px; line-height: 1.4; min-height: 100vh;
     }
 
-    /* ===== 頂部深藍列（鼎新經典） ===== */
+    /* Top bar */
     .topbar {
       height: var(--header-h);
       background: linear-gradient(to bottom, #0055a4 0%, #003366 100%);
-      color: #fff;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 0 12px;
-      position: fixed;
-      top: 0; left: 0; right: 0;
-      z-index: 300;
-      border-bottom: 1px solid #002244;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.25);
+      color: #fff; display: flex; align-items: center; justify-content: space-between;
+      padding: 0 12px; position: fixed; top: 0; left: 0; right: 0; z-index: 300;
+      border-bottom: 1px solid #002244; box-shadow: 0 1px 3px rgba(0,0,0,0.25);
     }
-
     .topbar-left { display: flex; align-items: center; gap: 10px; }
     .topbar-logo { font-size: 15px; font-weight: 700; letter-spacing: 1px; }
     .topbar-logo small { font-weight: 400; font-size: 12px; opacity: 0.9; margin-left: 6px; }
     .topbar-right { display: flex; align-items: center; gap: 14px; font-size: 12px; }
     .topbar-right .badge {
-      background: #e53935; color: #fff; font-size: 10px;
-      min-width: 14px; height: 14px; border-radius: 7px;
-      display: inline-flex; align-items: center; justify-content: center;
+      background: #e53935; color: #fff; font-size: 10px; min-width: 14px; height: 14px;
+      border-radius: 7px; display: inline-flex; align-items: center; justify-content: center;
       margin-left: 2px; font-weight: 600;
     }
+    .menu-btn { display: none; background: none; border: none; color: #fff; font-size: 18px; cursor: pointer; padding: 2px 6px; }
 
-    .menu-btn {
-      display: none; background: none; border: none; color: #fff;
-      font-size: 18px; cursor: pointer; padding: 2px 6px;
-    }
+    /* Layout */
+    .wrap { display: flex; margin-top: var(--header-h); min-height: calc(100vh - var(--header-h)); }
 
-    /* ===== 版面 ===== */
-    .wrap {
-      display: flex;
-      margin-top: var(--header-h);
-      min-height: calc(100vh - var(--header-h));
-    }
-
-    /* ===== 左側選單 ===== */
+    /* Sidebar */
     .sidebar {
-      width: var(--sidebar-w);
-      background: #eef3f8;
-      border-right: 1px solid var(--border);
-      position: fixed;
-      top: var(--header-h); left: 0; bottom: 0;
-      overflow-y: auto; z-index: 200;
+      width: var(--sidebar-w); background: #eef3f8; border-right: 1px solid var(--border);
+      position: fixed; top: var(--header-h); left: 0; bottom: 0; overflow-y: auto; z-index: 200;
     }
-
     .side-title {
-      background: #c5d4e4;
-      border-bottom: 1px solid var(--border);
-      padding: 6px 10px;
-      font-size: 12px; font-weight: 700; color: var(--primary);
+      background: #c5d4e4; border-bottom: 1px solid var(--border);
+      padding: 6px 10px; font-size: 12px; font-weight: 700; color: var(--primary);
     }
-
     .side-item {
-      display: block;
-      padding: 7px 12px 7px 14px;
-      color: #2d3748;
-      font-size: 13px;
-      border-bottom: 1px solid #d8e2ec;
-      cursor: pointer;
-      border-left: 3px solid transparent;
+      display: block; padding: 7px 12px 7px 14px; color: #2d3748; font-size: 13px;
+      border-bottom: 1px solid #d8e2ec; cursor: pointer; border-left: 3px solid transparent;
     }
     .side-item:hover { background: #d9e6f2; color: var(--primary); }
     .side-item.active {
-      background: #c8daf0;
-      color: var(--primary);
-      font-weight: 700;
-      border-left-color: #0066b3;
+      background: #c8daf0; color: var(--primary); font-weight: 700; border-left-color: #0066b3;
     }
+    .side-group { font-size: 11px; color: #78909c; padding: 8px 12px 2px; font-weight: 600; }
 
-    /* ===== 主內容 ===== */
-    .main {
-      flex: 1;
-      margin-left: var(--sidebar-w);
-      padding: 10px 12px 16px;
-    }
-
-    .crumb {
-      font-size: 12px; color: var(--secondary);
-      margin-bottom: 8px;
-    }
+    /* Main */
+    .main { flex: 1; margin-left: var(--sidebar-w); padding: 10px 12px 16px; }
+    .crumb { font-size: 12px; color: var(--secondary); margin-bottom: 8px; }
     .crumb b { color: var(--primary); }
 
-    /* 統計列 */
-    .stat-row {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 8px;
-      margin-bottom: 10px;
-    }
+    /* Stats */
+    .stat-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 10px; }
     .stat-box {
-      background: #fff;
-      border: 1px solid var(--border);
-      padding: 10px 12px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
+      background: #fff; border: 1px solid var(--border); padding: 10px 12px;
+      display: flex; align-items: center; gap: 10px;
     }
-    .stat-box .num {
-      font-size: 22px; font-weight: 700; color: var(--primary);
-      line-height: 1;
-    }
+    .stat-box .num { font-size: 22px; font-weight: 700; color: var(--primary); line-height: 1; }
     .stat-box .lbl { font-size: 12px; color: var(--secondary); }
 
-    /* 面板 */
-    .panel-row {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 8px;
-      margin-bottom: 8px;
-    }
-    .panel {
-      background: #fff;
-      border: 1px solid var(--border);
-    }
+    /* Panels */
+    .panel-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; }
+    .panel { background: #fff; border: 1px solid var(--border); }
     .panel-hd {
-      background: #e4ecf5;
-      border-bottom: 1px solid var(--border);
-      padding: 6px 10px;
+      background: #e4ecf5; border-bottom: 1px solid var(--border); padding: 6px 10px;
       font-size: 13px; font-weight: 700; color: var(--primary);
       display: flex; justify-content: space-between; align-items: center;
     }
-    .panel-hd a {
-      font-size: 12px; color: var(--accent); font-weight: 400;
-      text-decoration: none; cursor: pointer;
-    }
+    .panel-hd a { font-size: 12px; color: var(--accent); font-weight: 400; text-decoration: none; cursor: pointer; }
     .panel-hd a:hover { text-decoration: underline; }
     .panel-bd { padding: 0; }
 
     .row {
-      display: flex; align-items: center; gap: 8px;
-      padding: 6px 10px;
-      border-bottom: 1px solid var(--border-light);
-      font-size: 13px;
-      cursor: pointer;
+      display: flex; align-items: center; gap: 8px; padding: 6px 10px;
+      border-bottom: 1px solid var(--border-light); font-size: 13px; cursor: pointer;
     }
     .row:last-child { border-bottom: none; }
     .row:hover { background: #f0f6fc; }
     .row .t { flex: 1; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
     .row .m { font-size: 11px; color: var(--secondary); flex-shrink: 0; }
 
-    .tag {
-      font-size: 11px; padding: 0 4px; border: 1px solid;
-      margin-right: 4px; font-weight: 600;
-    }
+    .tag { font-size: 11px; padding: 0 4px; border: 1px solid; margin-right: 4px; font-weight: 600; }
     .tag-r { background: #fce4ec; color: #c62828; border-color: #ef9a9a; }
     .tag-b { background: #e3f2fd; color: #1565c0; border-color: #90caf9; }
     .tag-g { background: #e8f5e9; color: #2e7d32; border-color: #a5d6a7; }
 
     .chk {
-      width: 13px; height: 13px; border: 1px solid #78909c;
-      flex-shrink: 0; cursor: pointer;
+      width: 13px; height: 13px; border: 1px solid #78909c; flex-shrink: 0; cursor: pointer;
     }
     .chk.on { background: #2e7d32; border-color: #2e7d32; position: relative; }
     .chk.on::after {
-      content: "✓"; color: #fff; font-size: 10px;
-      position: absolute; top: -2px; left: 1px; font-weight: 700;
+      content: "✓"; color: #fff; font-size: 10px; position: absolute; top: -2px; left: 1px; font-weight: 700;
     }
-
     .pri { font-size: 11px; padding: 0 3px; font-weight: 600; margin-right: 3px; }
     .pri-h { background: #fce4ec; color: #c62828; }
     .pri-m { background: #fff8e1; color: #f57f17; }
     .pri-l { background: #e8f5e9; color: #2e7d32; }
 
-    .sys-grid {
-      display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px;
-      padding: 8px;
-    }
+    .sys-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; padding: 8px; }
     .sys-btn {
-      border: 1px solid var(--border); background: #f7fafc;
-      text-align: center; padding: 10px 4px; cursor: pointer;
+      border: 1px solid var(--border); background: #f7fafc; text-align: center;
+      padding: 10px 4px; cursor: pointer; text-decoration: none; color: inherit; display: block;
     }
     .sys-btn:hover { background: #e3f2fd; border-color: #90caf9; }
     .sys-btn .c { font-weight: 700; color: var(--primary); font-size: 13px; }
     .sys-btn .n { font-size: 11px; color: var(--secondary); }
 
-    /* 表格頁 */
+    /* Tables */
     .page { display: none; }
     .page.on { display: block; }
-
-    table.grid {
-      width: 100%; border-collapse: collapse;
-      background: #fff; border: 1px solid var(--border);
-    }
+    table.grid { width: 100%; border-collapse: collapse; background: #fff; border: 1px solid var(--border); }
     table.grid th {
-      background: #d0dce8;
-      border: 1px solid var(--border);
-      padding: 6px 8px;
-      font-size: 12px; font-weight: 700; color: var(--primary);
-      text-align: left;
+      background: #d0dce8; border: 1px solid var(--border); padding: 6px 8px;
+      font-size: 12px; font-weight: 700; color: var(--primary); text-align: left;
     }
-    table.grid td {
-      border: 1px solid var(--border-light);
-      padding: 6px 8px;
-      font-size: 13px;
-    }
+    table.grid td { border: 1px solid var(--border-light); padding: 6px 8px; font-size: 13px; }
     table.grid tr:hover td { background: #f0f6fc; }
 
-    /* 手機 */
+    /* System page cards */
+    .func-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 12px; }
+    .func-card {
+      border: 1px solid #c0cdd8; padding: 14px; text-align: center; cursor: pointer; background: #f8fafc;
+    }
+    .func-card:hover { background: #e3f2fd; border-color: #90caf9; }
+    .func-card .t { font-weight: 700; color: #003366; margin-bottom: 4px; }
+    .func-card .d { font-size: 12px; color: #666; }
+
+    .st { font-size: 11px; padding: 1px 5px; font-weight: 600; }
+    .st-w { background: #fff8e1; color: #f57f17; }
+    .st-d { background: #e8f5e9; color: #2e7d32; }
+
+    /* Mobile */
     @media (max-width: 860px) {
       .sidebar { transform: translateX(-100%); transition: 0.2s; }
       .sidebar.open { transform: translateX(0); }
       .main { margin-left: 0; }
       .panel-row { grid-template-columns: 1fr; }
       .stat-row { grid-template-columns: 1fr 1fr; }
+      .func-grid { grid-template-columns: 1fr 1fr; }
       .menu-btn { display: block; }
     }
     @media (max-width: 480px) {
       .stat-row { grid-template-columns: 1fr 1fr; gap: 6px; }
       .sys-grid { grid-template-columns: 1fr 1fr; }
     }
-
     .mask {
-      display: none; position: fixed; inset: 0;
-      background: rgba(0,0,0,0.3); z-index: 150;
-      top: var(--header-h);
+      display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.3);
+      z-index: 150; top: var(--header-h);
     }
     .mask.on { display: block; }
   </style>
@@ -258,7 +176,7 @@
 <div class="topbar">
   <div class="topbar-left">
     <button class="menu-btn" onclick="toggleSide()">☰</button>
-    <div class="topbar-logo">PowerEIP <small>企業入口與協作平台</small></div>
+    <div class="topbar-logo" id="topTitle">PowerEIP <small>企業入口與協作平台</small></div>
   </div>
   <div class="topbar-right">
     <span>通知 <span class="badge">3</span></span>
@@ -271,27 +189,31 @@
 <div class="wrap">
   <div class="sidebar" id="side">
     <div class="side-title">功能選單</div>
+    <div class="side-group">入口</div>
     <div class="side-item active" data-p="home" onclick="go('home')">首頁總覽</div>
     <div class="side-item" data-p="announce" onclick="go('announce')">公告管理</div>
     <div class="side-item" data-p="todo" onclick="go('todo')">我的待辦</div>
     <div class="side-item" data-p="calendar" onclick="go('calendar')">行事曆</div>
     <div class="side-item" data-p="docs" onclick="go('docs')">文件中心</div>
-    <div class="side-item" data-p="systems" onclick="go('systems')">系統入口</div>
+    <div class="side-group">系統</div>
+    <div class="side-item" data-p="hrm" onclick="go('hrm')">HRM 人資系統</div>
+    <div class="side-item" data-p="bpm" onclick="go('bpm')">BPM 流程管理</div>
+    <div class="side-item" data-p="erp" onclick="go('erp')">ERP 營運管理</div>
+    <div class="side-item" data-p="iso" onclick="go('iso')">ISO 文件制度</div>
+    <div class="side-item" data-p="systems" onclick="go('systems')">全部系統入口</div>
   </div>
 
   <div class="main">
 
-    <!-- 首頁 -->
+    <!-- ===== 首頁 ===== -->
     <div class="page on" id="p-home">
       <div class="crumb"><b>PowerEIP</b> 〉 首頁總覽</div>
-
       <div class="stat-row">
         <div class="stat-box"><div><div class="num">7</div><div class="lbl">待辦事項</div></div></div>
         <div class="stat-box"><div><div class="num">3</div><div class="lbl">未讀公告</div></div></div>
         <div class="stat-box"><div><div class="num">2</div><div class="lbl">今日行程</div></div></div>
         <div class="stat-box"><div><div class="num">5</div><div class="lbl">最近文件</div></div></div>
       </div>
-
       <div class="panel-row">
         <div class="panel">
           <div class="panel-hd">最新公告 <a onclick="go('announce')">更多 »</a></div>
@@ -310,7 +232,6 @@
           </div>
         </div>
       </div>
-
       <div class="panel-row">
         <div class="panel">
           <div class="panel-hd">近期行程 <a onclick="go('calendar')">更多 »</a></div>
@@ -323,16 +244,16 @@
         <div class="panel">
           <div class="panel-hd">常用系統 <a onclick="go('systems')">更多 »</a></div>
           <div class="sys-grid">
-            <div class="sys-btn"><div class="c">HRM</div><div class="n">人資系統</div></div>
-            <div class="sys-btn"><div class="c">BPM</div><div class="n">流程管理</div></div>
-            <div class="sys-btn"><div class="c">ERP</div><div class="n">營運管理</div></div>
-            <div class="sys-btn"><div class="c">ISO</div><div class="n">文件制度</div></div>
+            <div class="sys-btn" onclick="go('hrm')"><div class="c">HRM</div><div class="n">人資系統</div></div>
+            <div class="sys-btn" onclick="go('bpm')"><div class="c">BPM</div><div class="n">流程管理</div></div>
+            <div class="sys-btn" onclick="go('erp')"><div class="c">ERP</div><div class="n">營運管理</div></div>
+            <div class="sys-btn" onclick="go('iso')"><div class="c">ISO</div><div class="n">文件制度</div></div>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- 公告 -->
+    <!-- ===== 公告 ===== -->
     <div class="page" id="p-announce">
       <div class="crumb"><b>PowerEIP</b> 〉 公告管理</div>
       <table class="grid">
@@ -345,7 +266,7 @@
       </table>
     </div>
 
-    <!-- 待辦 -->
+    <!-- ===== 待辦 ===== -->
     <div class="page" id="p-todo">
       <div class="crumb"><b>PowerEIP</b> 〉 我的待辦</div>
       <table class="grid">
@@ -358,7 +279,7 @@
       </table>
     </div>
 
-    <!-- 行事曆 -->
+    <!-- ===== 行事曆 ===== -->
     <div class="page" id="p-calendar">
       <div class="crumb"><b>PowerEIP</b> 〉 行事曆</div>
       <table class="grid">
@@ -371,7 +292,7 @@
       </table>
     </div>
 
-    <!-- 文件 -->
+    <!-- ===== 文件 ===== -->
     <div class="page" id="p-docs">
       <div class="crumb"><b>PowerEIP</b> 〉 文件中心</div>
       <table class="grid">
@@ -384,31 +305,146 @@
       </table>
     </div>
 
-    <!-- 系統 -->
+    <!-- ===== 系統入口 ===== -->
     <div class="page" id="p-systems">
       <div class="crumb"><b>PowerEIP</b> 〉 系統入口</div>
       <table class="grid">
         <tr><th style="width:70px">代碼</th><th>系統名稱</th><th>說明</th></tr>
-        <tr><td><b>HRM</b></td><td>PowerHRM – 人資系統</td><td>人事、差勤、請假、薪資</td></tr>
-        <tr><td><b>BPM</b></td><td>PowerBPM – 流程管理</td><td>表單簽核、流程追蹤</td></tr>
-        <tr><td><b>ERP</b></td><td>PowerERP – 營運管理</td><td>財務、採購、庫存、生產、銷售</td></tr>
-        <tr><td><b>ISO</b></td><td>PowerISO – 文件與制度</td><td>文件版本、權限、稽核軌跡</td></tr>
+        <tr style="cursor:pointer" onclick="go('hrm')"><td><b>HRM</b></td><td>PowerHRM – 人資系統</td><td>人事、差勤、請假、薪資</td></tr>
+        <tr style="cursor:pointer" onclick="go('bpm')"><td><b>BPM</b></td><td>PowerBPM – 流程管理</td><td>表單簽核、流程追蹤</td></tr>
+        <tr style="cursor:pointer" onclick="go('erp')"><td><b>ERP</b></td><td>PowerERP – 營運管理</td><td>財務、採購、庫存、生產、銷售</td></tr>
+        <tr style="cursor:pointer" onclick="go('iso')"><td><b>ISO</b></td><td>PowerISO – 文件與制度</td><td>文件版本、權限、稽核軌跡</td></tr>
         <tr><td><b>MAIL</b></td><td>企業信箱</td><td>Outlook / 內部郵件系統</td></tr>
         <tr><td><b>IM</b></td><td>即時通訊</td><td>Teams / 內部聊天</td></tr>
       </table>
+    </div>
+
+    <!-- ===== HRM ===== -->
+    <div class="page" id="p-hrm">
+      <div class="crumb"><b>PowerHRM</b> 〉 人資系統　<a onclick="go('home')" style="color:#0066b3;cursor:pointer;">← 返回入口</a></div>
+      <div class="panel" style="margin-bottom:10px;">
+        <div class="panel-hd">功能選單</div>
+        <div class="func-grid">
+          <div class="func-card"><div class="t">人事資料</div><div class="d">員工基本資料維護</div></div>
+          <div class="func-card"><div class="t">差勤管理</div><div class="d">上下班、加班、請假</div></div>
+          <div class="func-card"><div class="t">請假申請</div><div class="d">年假、病假、事假</div></div>
+          <div class="func-card"><div class="t">薪資計算</div><div class="d">薪資結構、發薪作業</div></div>
+          <div class="func-card"><div class="t">考核評核</div><div class="d">績效考核作業</div></div>
+          <div class="func-card"><div class="t">組織架構</div><div class="d">部門、職級設定</div></div>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="panel-hd">近期差勤摘要</div>
+        <table class="grid">
+          <tr><th>員工</th><th>類型</th><th>日期</th><th>狀態</th></tr>
+          <tr><td>王小明</td><td>年假</td><td>2026/10/20</td><td>已核准</td></tr>
+          <tr><td>陳美玲</td><td>病假</td><td>2026/10/15</td><td>審核中</td></tr>
+          <tr><td>林志豪</td><td>加班</td><td>2026/10/12</td><td>已核准</td></tr>
+        </table>
+      </div>
+    </div>
+
+    <!-- ===== BPM ===== -->
+    <div class="page" id="p-bpm">
+      <div class="crumb"><b>PowerBPM</b> 〉 流程管理　<a onclick="go('home')" style="color:#0066b3;cursor:pointer;">← 返回入口</a></div>
+      <div class="panel" style="margin-bottom:10px;">
+        <div class="panel-hd">功能選單</div>
+        <div class="func-grid">
+          <div class="func-card"><div class="t">待簽核</div><div class="d">需我處理的表單</div></div>
+          <div class="func-card"><div class="t">我的申請</div><div class="d">我發起的流程</div></div>
+          <div class="func-card"><div class="t">流程追蹤</div><div class="d">查看進度狀態</div></div>
+          <div class="func-card"><div class="t">表單設計</div><div class="d">自訂簽核表單</div></div>
+          <div class="func-card"><div class="t">流程設定</div><div class="d">簽核路徑維護</div></div>
+          <div class="func-card"><div class="t">統計報表</div><div class="d">簽核效率分析</div></div>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="panel-hd">待我簽核</div>
+        <table class="grid">
+          <tr><th>單號</th><th>表單名稱</th><th>申請人</th><th>送出時間</th><th>狀態</th></tr>
+          <tr><td>BPM20261012001</td><td>請假申請</td><td>陳美玲</td><td>10/12 09:15</td><td><span class="st st-w">待審</span></td></tr>
+          <tr><td>BPM20261011008</td><td>採購申請</td><td>林志豪</td><td>10/11 16:40</td><td><span class="st st-w">待審</span></td></tr>
+          <tr><td>BPM20261010003</td><td>出差申請</td><td>王小明</td><td>10/10 11:20</td><td><span class="st st-d">已核准</span></td></tr>
+        </table>
+      </div>
+    </div>
+
+    <!-- ===== ERP ===== -->
+    <div class="page" id="p-erp">
+      <div class="crumb"><b>PowerERP</b> 〉 營運管理　<a onclick="go('home')" style="color:#0066b3;cursor:pointer;">← 返回入口</a></div>
+      <div class="panel" style="margin-bottom:10px;">
+        <div class="panel-hd">功能模組</div>
+        <div class="func-grid">
+          <div class="func-card"><div class="t">銷售管理</div><div class="d">報價、訂單、出貨</div></div>
+          <div class="func-card"><div class="t">採購管理</div><div class="d">請購、採購、進貨</div></div>
+          <div class="func-card"><div class="t">庫存管理</div><div class="d">入庫、出庫、盤點</div></div>
+          <div class="func-card"><div class="t">生產管理</div><div class="d">製令、MRP、完工</div></div>
+          <div class="func-card"><div class="t">財務會計</div><div class="d">傳票、應收應付</div></div>
+          <div class="func-card"><div class="t">報表中心</div><div class="d">營運分析報表</div></div>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="panel-hd">今日營運摘要</div>
+        <table class="grid">
+          <tr><th>項目</th><th>數量 / 金額</th><th>說明</th></tr>
+          <tr><td>今日訂單</td><td>12 張</td><td>含未出貨 5 張</td></tr>
+          <tr><td>今日進貨</td><td>NT$ 286,000</td><td>3 張進貨單</td></tr>
+          <tr><td>庫存警示</td><td>8 項</td><td>低於安全庫存</td></tr>
+        </table>
+      </div>
+    </div>
+
+    <!-- ===== ISO ===== -->
+    <div class="page" id="p-iso">
+      <div class="crumb"><b>PowerISO</b> 〉 文件與制度　<a onclick="go('home')" style="color:#0066b3;cursor:pointer;">← 返回入口</a></div>
+      <div class="panel" style="margin-bottom:10px;">
+        <div class="panel-hd">功能選單</div>
+        <div class="func-grid">
+          <div class="func-card"><div class="t">文件管理</div><div class="d">上傳、版本控制</div></div>
+          <div class="func-card"><div class="t">制度規章</div><div class="d">公司制度文件</div></div>
+          <div class="func-card"><div class="t">審核流程</div><div class="d">文件審核簽核</div></div>
+          <div class="func-card"><div class="t">權限設定</div><div class="d">閱讀與下載權限</div></div>
+          <div class="func-card"><div class="t">稽核軌跡</div><div class="d">操作紀錄查詢</div></div>
+          <div class="func-card"><div class="t">發行通知</div><div class="d">新版文件公告</div></div>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="panel-hd">最近文件</div>
+        <table class="grid">
+          <tr><th>文件名稱</th><th>版本</th><th>單位</th><th>更新日期</th></tr>
+          <tr><td>人資規章手冊</td><td>v3.2</td><td>人資部</td><td>2026/10/08</td></tr>
+          <tr><td>ISO 9001 程序文件</td><td>v2.1</td><td>品保部</td><td>2026/09/28</td></tr>
+          <tr><td>資訊安全政策</td><td>v1.5</td><td>資訊部</td><td>2026/09/15</td></tr>
+        </table>
+      </div>
     </div>
 
   </div>
 </div>
 
 <script>
+  const titles = {
+    home: 'PowerEIP <small>企業入口與協作平台</small>',
+    announce: 'PowerEIP <small>公告管理</small>',
+    todo: 'PowerEIP <small>我的待辦</small>',
+    calendar: 'PowerEIP <small>行事曆</small>',
+    docs: 'PowerEIP <small>文件中心</small>',
+    systems: 'PowerEIP <small>系統入口</small>',
+    hrm: 'PowerHRM <small>人資系統</small>',
+    bpm: 'PowerBPM <small>流程管理</small>',
+    erp: 'PowerERP <small>營運管理</small>',
+    iso: 'PowerISO <small>文件與制度</small>'
+  };
+
   function go(p) {
     document.querySelectorAll('.page').forEach(el => el.classList.remove('on'));
     document.getElementById('p-' + p).classList.add('on');
     document.querySelectorAll('.side-item').forEach(el => {
       el.classList.toggle('active', el.dataset.p === p);
     });
+    document.getElementById('topTitle').innerHTML = titles[p] || titles.home;
     closeSide();
+    window.scrollTo(0, 0);
   }
   function toggleSide() {
     document.getElementById('side').classList.toggle('open');
