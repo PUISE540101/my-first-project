@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HR Web Service</title>
+    <style>
+        :root {
+            --nav-bg: #222831;
+            --nav-text: #aaa;
+            --accent: #2563eb;
+            --body-bg: #f5f7fa;
+            --card-bg: rgba(255,255,255,0.82);
+            --text: #222;
+            --text-light: #888;
+            --border: #e0e0e0;
+            --input-bg: #fafafa;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: "Segoe UI", "Microsoft JhengHei", sans-serif;
+            background: var(--body-bg);
+            color: var(--text);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* ── 導覽列（對照照片：深色、居中選項） ── */
+        .navbar {
+            background: var(--nav-bg);
+            height: 54px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 48px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.25);
+        }
+        .nav-left { display: flex; align-items: center; gap: 4px; }
+        .nav-logo {
+            width: 26px; height: 26px;
+            border: 2px solid #555;
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 11px; color: #888; font-weight: 900;
+            margin-right: 16px;
+        }
+        .nav-item {
+            color: var(--nav-text);
+            font-size: 14px;
+            padding: 0 22px;
+            height: 54px;
+            display: flex; align-items: center;
+            cursor: pointer;
+            transition: color 0.2s;
+            position: relative;
+            letter-spacing: 0.5px;
+        }
+        .nav-item:hover { color: #fff; }
+        .nav-item.active { color: #fff; font-weight: 600; }
+        .nav-item.active::after {
+            content: '';
+            position: absolute; bottom: 0; left: 0; right: 0;
+            height: 3px;
+            background: var(--accent);
+            border-radius: 3px 3px 0 0;
+        }
+        .nav-right { display: flex; gap: 8px; align-items: center; }
+        .lang-btn {
+            width: 32px; height: 32px;
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 10px; font-weight: 900; color: #fff;
+            cursor: default;
+            letter-spacing: 0;
+        }
+
+        /* ── 主內容區 ── */
+        .main { min-height: calc(100vh - 54px - 52px); display: flex; justify-content: center; align-items: flex-start; padding: 60px 20px 40px; }
+        .view { display: none; width: 100%; max-width: 820px; animation: fadeIn 0.35s ease; }
+        .view.active { display: block; }
+        @keyframes fadeIn { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
+
+        /* ── 首頁（對照照片1）── */
+        .home-card {
+            background: var(--card-bg);
+            border-radius: 8px;
+            padding: 0;
+            box-shadow: 0 2px 16px rgba(0,0,0,0.07);
+            overflow: hidden;
+            position: relative;
+            min-height: 420px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .home-content { text-align: center; padding: 60px 40px; position: relative; z-index: 2; }
+        .home-title { font-size: 3rem; font-weight: 800; color: #222; letter-spacing: -1px; }
+        .home-sub { font-size: 14px; color: #999; margin-top: 10px; letter-spacing: 2px; }
+        /* 手機裝飾 - 右下角 */
+        .phone-deco {
+            position: absolute; bottom: 20px; right: 28px;
+            opacity: 0.13;
+            transform: rotate(12deg);
+            width: 110px;
+        }
+        /* 筆電裝飾 - 左上角 */
+        .laptop-deco {
+            position: absolute; top: 18px; left: 18px;
+            opacity: 0.07;
+            transform: rotate(-5deg);
+            width: 130px;
+        }
+
+        /* ── 表單卡片（請假單、未刷單）── */
+        .form-card {
+            background: var(--card-bg);
+            border-radius: 8px;
+            padding: 44px 52px 36px;
+            box-shadow: 0 2px 16px rgba(0,0,0,0.07);
+            position: relative;
+            overflow: hidden;
+        }
+        .form-title {
+            text-align: center;
+            font-size: 22px;
+            font-weight: 400;
+            color: #555;
+            letter-spacing: 8px;
+            margin-bottom: 8px;
+        }
+        .form-divider { border: none; border-top: 1px solid #eee; margin: 18px 0 32px; }
+
+        /* ── 表單欄位 ── */
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0 64px; }
+        .field { margin-bottom: 20px; }
+        .field label {
+            display: block;
+            font-size: 13px;
+            color: #888;
+            margin-bottom: 7px;
+        }
+        .field input, .field select {
+            width: 100%;
+            padding: 9px 12px;
+            border: none;
+            border-bottom: 1px solid #ddd;
+            background: transparent;
+            font-size: 14px;
+            color: var(--text);
+            font-family: inherit;
+            outline: none;
+            transition: border-color 0.2s;
+            border-radius: 0;
+        }
+        .field input:focus, .field select:focus { border-bottom-color: var(--accent); }
+        .field input[readonly] { color: #bbb; cursor: not-allowed; }
+        .field .input-wrap { position: relative; }
+        .field .input-wrap input { padding-right: 32px; }
+        .eye-btn {
+            position: absolute; right: 4px; top: 50%;
+            transform: translateY(-50%);
+            background: none; border: none; cursor: pointer;
+            color: #bbb; font-size: 16px; padding: 2px;
+        }
+        .eye-btn:hover { color: #666; }
+
+        /* ── 申請紀錄按鈕區（未刷單頂部）── */
+        .record-top { display: flex; align-items: center; margin-bottom: 24px; gap: 20px; }
+        .record-top .form-title { margin: 0; flex: 1; }
+
+        /* ── 黑曜石區 ── */
+        /* ── 按鈕 ── */
+        .btn-row { display: flex; justify-content: center; gap: 12px; margin-top: 32px; flex-wrap: wrap; }
+        .btn {
+            padding: 10px 36px;
+            border-radius: 5px;
+            border: none;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 700;
+            font-family: inherit;
+            transition: 0.2s;
+            letter-spacing: 1px;
+        }
+        .btn:hover { opacity: 0.88; transform: translateY(-1px); }
+        .btn-blue { background: #1055c4; color: #fff; }
+        .btn-sky { background: #2563eb; color: #fff; }
+        .btn-dark { background: #2b2b2b; color: #fbbf24; }
+        .btn-gray { background: #64748b; color: #fff; }
+        .btn-sm { padding: 8px 20px; font-size: 13px; }
+
+        /* ── 手機裝飾 SVG（右下角）── */
+        .phone-svg {
+            position: absolute;
+            bottom: 20px; right: 24px;
+            width: 90px; opacity: 0.1;
+            pointer-events: none;
+            transform: rotate(14deg);
+        }
+
+        /* ── Toast ── */
+        .toast {
+            position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%);
+            background: #222; color: #fff;
+            padding: 12px 28px; border-radius: 28px;
+            font-size: 14px; font-weight: 600;
+            z-index: 9999; display: none;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+        }
+        .toast.show { display: block; animation: tin 0.3s ease; }
+        @keyframes tin { from{opacity:0;transform:translateX(-50%) translateY(12px)} to{opacity:1;transform:translateX(-50%) translateY(0)} }
+
+        /* ── 頁尾 ── */
+        .footer {
+            text-align: center;
+            padding: 16px;
+            color: #bbb;
+            font-size: 11px;
+            letter-spacing: 1px;
+            background: transparent;
+        }
+
+
+        /* 波紋背景 */
+        .wave-bg {
+            position: fixed; inset: 0; z-index: -1;
+            background: #f5f7fa;
+            overflow: hidden;
+        }
+        .wave-bg::before {
+            content: '';
+            position: absolute; inset: -50%;
+            background: repeating-conic-gradient(
+                from 0deg at 60% 55%,
+                rgba(120,200,180,0.18) 0deg,
+                rgba(200,150,220,0.12) 2deg,
+                rgba(150,180,255,0.10) 4deg,
+                transparent 6deg,
+                transparent 10deg
+            );
+            animation: waveRotate 18s linear infinite;
+        }
+        @keyframes waveRotate { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }
+        @media(max-width:620px) {
+            .form-grid { grid-template-columns: 1fr; gap: 0; }
+            .form-card { padding: 28px 18px; }
+            .navbar { padding: 0 16px; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- 導覽列 -->
+<div class="wave-bg"></div>
+<nav class="navbar">
+    <div class="nav-left">
+        <div class="nav-logo">G</div>
+        <div class="nav-item active" onclick="show('home',this)" id="tab-home">首頁</div>
+        <div class="nav-item" onclick="show('leave',this)" id="tab-leave">請假單</div>
+        <div class="nav-item" onclick="show('missing',this)" id="tab-missing">未刷單</div>
+    </div>
+    <div class="nav-right">
+        <div class="lang-btn" style="background:#e9573f">TW</div>
+        <div class="lang-btn" style="background:#f6bb42">TH</div>
+        <div class="lang-btn" style="background:#3bafda">ID</div>
+    </div>
+</nav>
+
+<div class="main">
+
+    <!-- 首頁 -->
+    <div id="view-home" class="view active">
+        <div class="home-card">
+            <!-- 筆電裝飾（左上） -->
+            <svg class="laptop-deco" viewBox="0 0 200 140">
+                <rect x="10" y="10" width="180" height="110" rx="8" fill="none" stroke="#333" stroke-width="6"/>
+                <rect x="0" y="120" width="200" height="14" rx="4" fill="none" stroke="#333" stroke-width="5"/>
+                <rect x="20" y="22" width="160" height="88" rx="3" fill="none" stroke="#333" stroke-width="3"/>
+            </svg>
+
+            <div class="home-content">
+                <div class="home-title">HR web service</div>
+                <div class="home-sub">Designed for IT</div>
+            </div>
+
+            <!-- 手機裝飾（右下） -->
+            <svg class="phone-deco" viewBox="0 0 100 200">
+                <rect x="8" y="4" width="84" height="192" rx="14" fill="none" stroke="#222" stroke-width="6"/>
+                <rect x="30" y="13" width="40" height="6" rx="3" fill="#222"/>
+                <circle cx="50" cy="188" r="8" fill="none" stroke="#222" stroke-width="4"/>
+                <rect x="16" y="28" width="68" height="148" rx="2" fill="none" stroke="#222" stroke-width="2"/>
+            </svg>
+        </div>
+    </div>
+
+    <!-- 請假單（對照照片3）-->
+    <div id="view-leave" class="view">
+        <div class="form-card">
+            <div class="form-title">請 假 單</div>
+            <hr class="form-divider">
+
+            <!-- 身分證後四碼 -->
+            <div style="max-width:260px; margin-bottom:20px;">
+                <div class="field">
+                    <label>身分證號後四碼</label>
+                    <div class="input-wrap">
+                        <input type="password" id="l_id4" maxlength="4" placeholder="••••" oninput="verifyID()">
+                        <button class="eye-btn" onclick="toggleEye('l_id4',this)">👁</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-grid">
+                <!-- 左欄 -->
+                <div>
+                    <div class="field">
+                        <label>工號</label>
+                        <input type="text" id="l_eid" placeholder="如：D01762" oninput="queryEmp()">
+                    </div>
+                    <div class="field">
+                        <label>姓名</label>
+                        <input type="text" id="l_name" readonly placeholder="自動載入">
+                    </div>
+                    <div class="field">
+                        <label>請假名稱</label>
+                        <select id="l_type">
+                            <option value="">請選擇 ...</option>
+                            <option>事假</option>
+                            <option>病假</option>
+                            <option>特休</option>
+                            <option>生理假</option>
+                            <option>婚假</option>
+                            <option>喪假</option>
+                            <option>陪產假</option>
+                            <option>家庭照顧假</option>
+                            <option>公假</option>
+                        </select>
+                    </div>
+                    <div class="field">
+                        <label>開始時間</label>
+                        <input type="datetime-local" id="l_start" onchange="calcHours()">
+                    </div>
+                    <div class="field">
+                        <label>結束時間</label>
+                        <input type="datetime-local" id="l_end" onchange="calcHours()">
+                    </div>
+                </div>
+                <!-- 右欄 -->
+                <div>
+                    <div class="field">
+                        <label>部門</label>
+                        <input type="text" id="l_dept" readonly placeholder="自動載入">
+                    </div>
+                    <div class="field">
+                        <label>1級主管</label>
+                        <input type="text" id="l_mgr1" readonly placeholder="自動載入">
+                    </div>
+                    <div class="field">
+                        <label>2級主管</label>
+                        <input type="text" id="l_mgr2" readonly placeholder="自動載入">
+                    </div>
+                    <div class="field">
+                        <label>未休時數</label>
+                        <input type="text" id="l_remain" readonly value="0">
+                    </div>
+                    <div class="field">
+                        <label>預計請假時數</label>
+                        <input type="text" id="l_hours" readonly placeholder="自動計算">
+                    </div>
+                </div>
+            </div>
+            </div>
+
+            <div class="btn-row">
+                <button class="btn btn-blue" onclick="queryEmp()">查詢</button>
+                <button class="btn btn-sky" onclick="submitLeave()">送出</button>
+                <button class="btn btn-dark" onclick="copyLeave()">📋 格式化複製</button>
+            </div>
+
+            <!-- 手機裝飾 -->
+            <svg class="phone-svg" viewBox="0 0 100 200">
+                <rect x="8" y="4" width="84" height="192" rx="14" fill="none" stroke="#333" stroke-width="5"/>
+                <rect x="30" y="13" width="40" height="5" rx="3" fill="#333"/>
+            </svg>
+        </div>
+    </div>
+
+    <!-- 未刷單（對照照片2）-->
+    <div id="view-missing" class="view">
+        <div class="form-card">
+            <div class="record-top">
+                <button class="btn btn-blue btn-sm" onclick="toggleRecords()">申請紀錄</button>
+                <div class="form-title">未 刷 單</div>
+            </div>
+            <hr class="form-divider" style="margin-top:0;">
+
+            <div class="form-grid">
+                <!-- 左欄 -->
+                <div>
+                    <div class="field">
+                        <label>工號</label>
+                        <input type="text" id="m_eid" placeholder="如：D01762">
+                    </div>
+                    <div class="field">
+                        <label>未刷卡原因</label>
+                        <select id="m_reason">
+                            <option value="">未帶卡</option>
+                            <option>忘記刷卡</option>
+                            <option>公出</option>
+                            <option>設備異常</option>
+                            <option>其他</option>
+                        </select>
+                    </div>
+                </div>
+                <!-- 右欄 -->
+                <div>
+                    <div class="field">
+                        <label>身分證號後四碼</label>
+                        <div class="input-wrap">
+                            <input type="password" id="m_id4" maxlength="4" placeholder="••••">
+                            <button class="eye-btn" onclick="toggleEye('m_id4',this)">👁</button>
+                        </div>
+                    </div>
+                    <div class="field">
+                        <label>未刷卡時間</label>
+                        <input type="datetime-local" id="m_time">
+                    </div>
+                </div>
+            </div>
+
+            <div class="btn-row" style="justify-content:flex-start;">
+                <button class="btn btn-blue" style="padding:12px 52px; font-size:15px;" onclick="submitMissing()">送出</button>
+            </div>
+
+            <!-- 申請紀錄區 -->
+            <div id="recordsArea" style="display:none; margin-top:28px;">
+                <hr style="border:none; border-top:1px solid #eee; margin-bottom:20px;">
+                <div style="font-size:13px; font-weight:700; color:#888; margin-bottom:12px; border-left:3px solid var(--accent); padding-left:10px;">未刷單申請紀錄</div>
+                <table style="width:100%; border-collapse:collapse; font-size:13px;">
+                    <thead>
+                        <tr style="background:#f8f9fa;">
+                            <th style="padding:9px 10px; text-align:left; color:#888; border-bottom:2px solid #eee;">工號</th>
+                            <th style="padding:9px 10px; text-align:left; color:#888; border-bottom:2px solid #eee;">原因</th>
+                            <th style="padding:9px 10px; text-align:left; color:#888; border-bottom:2px solid #eee;">未刷卡時間</th>
+                            <th style="padding:9px 10px; text-align:left; color:#888; border-bottom:2px solid #eee;">申請時間</th>
+                        </tr>
+                    </thead>
+                    <tbody id="recordsTbody">
+                        <tr><td colspan="4" style="text-align:center; color:#bbb; padding:20px;">尚無申請紀錄</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- 手機裝飾 -->
+            <svg class="phone-svg" viewBox="0 0 100 200">
+                <rect x="8" y="4" width="84" height="192" rx="14" fill="none" stroke="#333" stroke-width="5"/>
+                <rect x="30" y="13" width="40" height="5" rx="3" fill="#333"/>
+            </svg>
+        </div>
+    </div>
+
+</div>
+
+<div class="footer">
+    <div style="font-size:22px; margin-bottom:4px; opacity:0.3;">⚙</div>
+    © APEX DYNAMICS 2026
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+    // ── 分頁切換 ──
+    function show(id, el) {
+        document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+        document.querySelectorAll('.nav-item').forEach(t => t.classList.remove('active'));
+        document.getElementById('view-' + id).classList.add('active');
+        (el || document.getElementById('tab-' + id)).classList.add('active');
+    }
+
+    // ── Toast ──
+    function toast(msg, ms=2600) {
+        const t = document.getElementById('toast');
+        t.innerText = msg; t.className = 'toast show';
+        setTimeout(() => t.className = 'toast', ms);
+    }
+
+    // ── 眼睛切換 ──
+    function toggleEye(id, btn) {
+        const el = document.getElementById(id);
+        el.type = el.type === 'password' ? 'text' : 'password';
+        btn.innerText = el.type === 'password' ? '👁' : '🙈';
+    }
+
+    // ── 身分證後四碼驗證 ──
+    function verifyID() {
+        const v = document.getElementById('l_id4').value;
+        if(v.length === 4) toast('✔ 身份驗證通過，請填寫請假資訊');
+    }
+
+    // ── 工號查詢（可自行擴充對接資料庫）──
+    const mockDB = {
+        'D01762': { name:'盧家慶', dept:'資訊部', mgr1:'張主任', mgr2:'林副總', remain:'56' },
+        'D00518': { name:'李文欽', dept:'總務部', mgr1:'王課長', mgr2:'陳經理', remain:'40' },
+    };
+
+    function queryEmp() {
+        const eid = document.getElementById('l_eid').value.trim().toUpperCase();
+        if(!eid) return;
+        const d = mockDB[eid];
+        if(d) {
+            document.getElementById('l_name').value = d.name;
+            document.getElementById('l_dept').value = d.dept;
+            document.getElementById('l_mgr1').value = d.mgr1;
+            document.getElementById('l_mgr2').value = d.mgr2;
+            document.getElementById('l_remain').value = d.remain + ' 小時';
+            toast('✅ 已載入：' + d.name);
+        } else {
+            toast('❌ 查無此工號');
+        }
+    }
+
+    // ── 自動計算請假時數 ──
+    function calcHours() {
+        const s = document.getElementById('l_start').value;
+        const e = document.getElementById('l_end').value;
+        if(!s || !e) return;
+        const diff = (new Date(e) - new Date(s)) / 3600000;
+        document.getElementById('l_hours').value = diff > 0 ? diff.toFixed(1) + ' 小時' : '時間錯誤';
+    }
+
+    // ── 送出請假 ──
+    function submitLeave() {
+        const type = document.getElementById('l_type').value;
+        const start = document.getElementById('l_start').value;
+        const end = document.getElementById('l_end').value;
+        if(!type || !start || !end) return toast('⚠ 請填寫假別與請假時間');
+        toast('✅ 請假單已送出！');
+        clearLeaveForm();
+    }
+
+    function clearLeaveForm() {
+        ['l_eid','l_name','l_dept','l_mgr1','l_mgr2','l_remain','l_hours','l_backup','l_memo','l_id4'].forEach(id => {
+            const el = document.getElementById(id); if(el) el.value = '';
+        });
+        document.getElementById('l_type').value = '';
+        document.getElementById('l_start').value = '';
+        document.getElementById('l_end').value = '';
+    }
+
+    // ── 格式化複製（請假）──
+    function copyLeave() {
+        const get = id => document.getElementById(id)?.value || '';
+        const text = [
+            '【請假申請】',
+            '工號：' + get('l_eid'),
+            '姓名：' + get('l_name'),
+            '部門：' + get('l_dept'),
+            '假別：' + get('l_type'),
+            '開始：' + get('l_start'),
+            '結束：' + get('l_end'),
+            '時數：' + get('l_hours'),
+            '1級主管：' + get('l_mgr1'),
+            '2級主管：' + get('l_mgr2'),
+            '代理人：' + get('l_backup'),
+            '備註：' + get('l_memo'),
+        ].join('\n');
+        navigator.clipboard.writeText(text).then(() => toast('📋 已複製，請貼到公司系統備註欄'));
+    }
+
+    // ── 送出未刷單 ──
+    const missingRecords = [];
+
+    function submitMissing() {
+        const eid = document.getElementById('m_eid').value.trim();
+        const id4 = document.getElementById('m_id4').value;
+        const reason = document.getElementById('m_reason').value;
+        const time = document.getElementById('m_time').value;
+        if(!eid || !id4 || !time) return toast('⚠ 請填寫工號、身分證後四碼與時間');
+        missingRecords.unshift({ eid, reason, time, submitTime: new Date().toLocaleString('zh-TW') });
+        renderRecords();
+        toast('✅ 未刷單已送出！');
+        ['m_eid','m_id4','m_memo'].forEach(id => document.getElementById(id).value = '');
+        document.getElementById('m_reason').value = '';
+        document.getElementById('m_time').value = '';
+    }
+
+    function renderRecords() {
+        const tbody = document.getElementById('recordsTbody');
+        if(!missingRecords.length) { tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;color:#bbb;padding:20px;">尚無申請紀錄</td></tr>'; return; }
+        tbody.innerHTML = missingRecords.map(r =>
+            `<tr><td style="padding:9px 10px;border-bottom:1px solid #f0f0f0;">${r.eid}</td><td style="padding:9px 10px;border-bottom:1px solid #f0f0f0;">${r.reason}</td><td style="padding:9px 10px;border-bottom:1px solid #f0f0f0;">${r.time}</td><td style="padding:9px 10px;border-bottom:1px solid #f0f0f0;color:#888;">${r.submitTime}</td></tr>`
+        ).join('');
+    }
+
+    function toggleRecords() {
+        const area = document.getElementById('recordsArea');
+        area.style.display = area.style.display === 'none' ? 'block' : 'none';
+    }
+
+    // ── 格式化複製（未刷單）──
+    function copyMissing() {
+        const get = id => document.getElementById(id)?.value || '';
+        const text = [
+            '【未刷單申請】',
+            '工號：' + get('m_eid'),
+            '原因：' + get('m_reason'),
+            '未刷卡時間：' + get('m_time'),
+            '說明：' + get('m_memo'),
+        ].join('\n');
+        navigator.clipboard.writeText(text).then(() => toast('📋 已複製說明文字'));
+    }
+</script>
+
+</body>
+</html>
